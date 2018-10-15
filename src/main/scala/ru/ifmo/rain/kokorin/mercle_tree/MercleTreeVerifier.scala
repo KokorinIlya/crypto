@@ -2,6 +2,7 @@ package ru.ifmo.rain.kokorin.mercle_tree
 
 import MercleTreeUtils.{getHash, getParentNumber, calcPow2}
 import scala.util.{Failure, Success, Try}
+import ru.ifmo.rain.kokorin.common.{Digest, ProofElement, Document}
 
 class MercleTreeVerifier(digest: Digest, docsCount: Int) {
   private val sz = calcPow2(docsCount) - 1

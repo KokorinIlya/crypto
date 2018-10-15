@@ -3,22 +3,9 @@ package ru.ifmo.rain.kokorin.mercle_tree
 import scala.collection.mutable.ListBuffer
 import MercleTree._
 import MercleTreeUtils.{getHash, getParentNumber, calcPow2}
-
-sealed class Node(val index: Int, val hash: Array[Byte])
-
-case class TreeNode(override val index: Int, override val hash: Array[Byte]) extends Node(index, hash)
-
-case class LeafNode(document: Document, override val index: Int, override val hash: Array[Byte])
-  extends Node(index, hash)
-
-case class Document(value: Array[Byte])
-
-case class ProofElement(value: Array[Byte])
-
-case class Digest(value: Array[Byte])
+import ru.ifmo.rain.kokorin.common.{Digest, ProofElement, Document}
 
 class MercleTree(docs: Array[Document]) {
-
   def getDocument(ind: Int): Document = {
     if (ind < docs.length) {
       docs(ind)

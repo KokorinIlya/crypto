@@ -2,6 +2,9 @@ package ru.ifmo.rain.kokorin.mercle_tree;
 
 import org.junit.Test;
 import scala.collection.immutable.List;
+import ru.ifmo.rain.kokorin.common.Digest;
+import ru.ifmo.rain.kokorin.common.Document;
+import ru.ifmo.rain.kokorin.common.ProofElement;
 
 import static org.junit.Assert.*;
 

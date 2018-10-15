@@ -1,62 +1,47 @@
-package ru.ifmo.rain.kokorin
+package ru.ifmo.rain.kokorin.sparse_mercle_tree
 
 import java.nio.charset.StandardCharsets
-import java.security.MessageDigest
 import java.util.Base64
+import SparseMercleTreeUtils._
 
 import scala.io.StdIn
 
-object SparseMurcleTreeChecker {
+class SparseMurcleTreeVerifier(digest: Array[Byte], height: Int) {
+  private val sz = (1 << height) - 1
 
-  private val digest = MessageDigest.getInstance("SHA-256")
+  def verify(index: Int, document: Array[Byte], proof: Array[Array[Byte]]): Boolean = {
+    var curIndex = index + sz
+    var curHash = hashLeaf(document)
+
+    for (proofElement <- proof) {
+      if (curIndex % 2 == 1) {
+        curHash = hashNode(
+          Option(curHash).getOrElse(Array[Byte]()),
+          Option(proofElement).getOrElse(Array[Byte]())
+        )
+        curIndex = (curIndex - 1) / 2
+      } else {
+        curHash = hashNode(
+          Option(proofElement).getOrElse(Array[Byte]()),
+          Option(curHash).getOrElse(Array[Byte]())
+        )
+        curIndex = (curIndex - 1) / 2
+      }
+    }
+
+    if (curHash == null && digest == null) {
+      true
+    } else digest != null && curHash != null && (digest sameElements curHash)
+  }
+}
+
+object SparseMurcleTreeVerifier {
 
   def getData(): String = {
     val x = StdIn.readLine()
     if (x == "null") {
       null
     } else x
-  }
-
-  def hashLeaf(string: String): Array[Byte] = {
-    if (string == null) {
-      null
-    } else {
-      digest.digest(
-        Array.concat(
-          Array[Byte](0),
-          Base64.getDecoder.decode(string)
-        )
-      )
-    }
-  }
-
-  def hashNode(leftHash: Array[Byte], rightHash: Array[Byte]): Array[Byte] = {
-    if (leftHash == null && rightHash == null) {
-      null
-    } else if (leftHash == null && rightHash != null) {
-      digest.digest(
-        Array.concat(
-          Array[Byte](1),
-          Array[Byte](2),
-          rightHash
-        )
-      )
-    } else if (leftHash != null && rightHash == null) {
-      digest.digest(
-        Array.concat(
-          Array[Byte](1),
-          leftHash,
-          Array[Byte](2)
-        )
-      )
-    } else digest.digest(
-      Array.concat(
-        Array[Byte](1),
-        leftHash,
-        Array[Byte](2),
-        rightHash
-      )
-    )
   }
 
   def main(args: Array[String]): Unit = {
@@ -70,7 +55,7 @@ object SparseMurcleTreeChecker {
       val data = if (lines(1) == "null") null else lines(1)
 
       var curIndex = index + sz
-      var curHash = hashLeaf(data)
+      var curHash = hashLeaf(Base64.getDecoder.decode(data))
 
       for (j <- 1 to h) {
         val curProof = Option(getData())
