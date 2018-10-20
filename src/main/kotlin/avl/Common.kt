@@ -40,7 +40,7 @@ data class Hash(val data: ByteArray) {
 sealed class Node(open var prev: Node?, open var hash: Hash)
 
 data class LeafNode(val key: Int, val nextKey: Int?, val data: ByteArray,
-                    override var prev: Node?, override var hash: Hash): Node(prev, hash) {
+                    override var prev: Node?, override var hash: Hash) : Node(prev, hash) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -63,8 +63,63 @@ data class LeafNode(val key: Int, val nextKey: Int?, val data: ByteArray,
 }
 
 data class TreeNode(var left: Node?, var right: Node?, override var prev: Node?,
-                    var rightMin: Int, override var hash: Hash, var leftHeight: Int,
-                    var rightHeight: Int) : Node(prev, hash)
+                    var rightMin: Int?, var allMin: Int?, override var hash: Hash,
+                    var leftHeight: Int, var rightHeight: Int) : Node(prev, hash) {
+
+    fun calculateHeights() {
+        leftHeight = getHeight(left)
+        rightHeight = getHeight(right)
+    }
+
+    fun calculateMins() {
+        rightMin = getRightMinHelper(right)
+        val leftAllMin = getAllMinHelper(left)
+        val rightAllMin = getAllMinHelper(right)
+        if (leftAllMin != null && rightAllMin != null) {
+            allMin = minOf(leftAllMin, rightAllMin)
+        } else if (leftAllMin == null) {
+            allMin = rightAllMin
+        } else {
+            allMin = leftAllMin
+        }
+    }
+
+    fun getAllMinHelper(node: Node?): Int? {
+        if (node == null) {
+            return null
+        } else if (node is LeafNode) {
+            return node.key
+        } else if (node is TreeNode) {
+            return node.allMin
+        }
+
+        return null
+    }
+
+    fun getRightMinHelper(node: Node?): Int? {
+        if (node == null) {
+            return null
+        } else if (node is LeafNode) {
+            return node.key
+        } else if (node is TreeNode) {
+            return node.rightMin
+        }
+
+        return null
+    }
+
+    fun getHeight(node: Node?): Int {
+        if (node == null) {
+            return 0
+        } else if (node is LeafNode) {
+            return 1
+        } else if (node is TreeNode) {
+            return maxOf(node.leftHeight, node.rightHeight)
+        }
+
+        return 0
+    }
+}
 
 val Hasher: MessageDigest = MessageDigest.getInstance("SHA-256")
 
@@ -88,7 +143,7 @@ fun intToByteArray(x: Int): ByteArray {
 fun hashLeafNode(key: Int, value: ByteArray, nextKey: Int?): Hash {
     val keyBytes = intToByteArray(key)
     val nextKeyBytes = intToByteArray(nextKey ?: Integer.MAX_VALUE)
-    return  Hash(Hasher.digest(keyBytes + nextKeyBytes + value))
+    return Hash(Hasher.digest(keyBytes + nextKeyBytes + value))
 }
 
 
