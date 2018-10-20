@@ -65,6 +65,23 @@ data class Hash(val data: ByteArray) {
     }
 }
 
+data class Digest(val data: ByteArray) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Digest
+
+        if (!Arrays.equals(data, other.data)) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return Arrays.hashCode(data)
+    }
+}
+
 data class LeafData(val data: ByteArray) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -96,7 +113,6 @@ data class TreeNode(var left: Node?, var right: Node?, override var prev: Node?,
                     var rightMin: Int?, var allMin: Int?, override var hash: Hash,
                     var leftHeight: Int, var rightHeight: Int) : Node(prev, hash) {
 
-
     fun calculateHeights() {
         leftHeight = getHeight(left)
         rightHeight = getHeight(right)
@@ -106,37 +122,29 @@ data class TreeNode(var left: Node?, var right: Node?, override var prev: Node?,
         rightMin = getRightMinHelper(right)
         val leftAllMin = getAllMinHelper(left)
         val rightAllMin = getAllMinHelper(right)
-        if (leftAllMin != null && rightAllMin != null) {
-            allMin = minOf(leftAllMin, rightAllMin)
-        } else if (leftAllMin == null) {
-            allMin = rightAllMin
-        } else {
-            allMin = leftAllMin
-        }
+        allMin = if (leftAllMin != null && rightAllMin != null) {
+            minOf(leftAllMin, rightAllMin)
+        } else leftAllMin ?: rightAllMin
     }
 
     fun getAllMinHelper(node: Node?): Int? {
-        if (node == null) {
-            return null
-        } else if (node is LeafNode) {
-            return node.key
-        } else if (node is TreeNode) {
-            return node.allMin
+        when (node) {
+            null -> return null
+            is LeafNode -> return node.key
+            is TreeNode -> return node.allMin
+            else -> return null
         }
 
-        return null
     }
 
     fun getRightMinHelper(node: Node?): Int? {
-        if (node == null) {
-            return null
-        } else if (node is LeafNode) {
-            return node.key
-        } else if (node is TreeNode) {
-            return node.rightMin
+        when (node) {
+            null -> return null
+            is LeafNode -> return node.key
+            is TreeNode -> return node.rightMin
+            else -> return null
         }
 
-        return null
     }
 
     fun getHeight(node: Node?): Int {
