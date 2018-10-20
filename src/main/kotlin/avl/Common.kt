@@ -3,27 +3,12 @@ package avl
 import java.security.MessageDigest
 import java.util.*
 
-data class ProofHash(val data: ByteArray) {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as ProofHash
-
-        if (!Arrays.equals(data, other.data)) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        return Arrays.hashCode(data)
-    }
-}
+data class ProofHash(val data: Hash)
 
 data class NodeHeightInfo(val leftHeight: Int, val rightHeight: Int)
 
 enum class Direction {
-    Left, Right
+    LEFT, RIGHT
 }
 
 data class Proof(val entries: List<ProofHash>, val heights: List<NodeHeightInfo>, val directions: List<Direction>) {
@@ -151,13 +136,15 @@ data class TreeNode(var left: Node?, var right: Node?, override var prev: Node?,
     }
 
     fun getRightMinHelper(node: Node?): Int? {
-        when (node) {
-            null -> return null
-            is LeafNode -> return node.key
-            is TreeNode -> return node.rightMin
-            else -> return null
+        if (node == null) {
+            return null
+        } else if (node is LeafNode) {
+            return node.key
+        } else if (node is TreeNode) {
+            return node.rightMin
         }
 
+        return null
     }
 
     fun getHeight(node: Node?): Int {
@@ -196,15 +183,20 @@ fun hashLeafNode(key: Int, value: LeafData, nextKey: Int?): Hash {
     val keyBytes = intToByteArray(key)
     val nextKeyBytes = intToByteArray(nextKey ?: Integer.MAX_VALUE)
     val pref = ByteArray(1){ i -> 0 }
-    return  Hash(pref + Hasher.digest(keyBytes + nextKeyBytes + value.data))
+    return Hash(pref + Hasher.digest(keyBytes + nextKeyBytes + value.data))
 }
 
 fun hashTreeNode(left: Node?, right: Node?): Hash {
-    val leftHash = left?.hash?.data ?: ByteArray(0)
-    val rightHash = right?.hash?.data ?: ByteArray(0)
+    return hashTreeNode(left?.hash, right?.hash)
+}
+
+
+fun hashTreeNode(leftHash: Hash?, rightHash: Hash?): Hash {
     val pref1 = ByteArray(1){ i -> 1}
     val pref2 = ByteArray(1) { i -> 2 }
-    return Hash(Hasher.digest(pref1 + leftHash + pref2 + rightHash))
+    val right = rightHash?.data ?: ByteArray(0)
+    val left = leftHash?.data ?: ByteArray(0)
+    return Hash(Hasher.digest(pref1 + left + pref2 + right))
 }
 
 
