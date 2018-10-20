@@ -11,36 +11,49 @@ import java.util.List;
 
 public class AVLTree {
 
+    private static Hash EMPTY_HASH = new Hash(new byte[0]);
+
     private TreeNode root = null;
 
     public AVLTree() {
-        Hash hash = new Hash(new byte[0]);
-        root = new TreeNode(null, null, null, null, null, hash, 0, 0);
+
+        root = new TreeNode(null, null, null, null, null, EMPTY_HASH, 0, 0);
     }
 
     public void add(LeafNode newNode) throws Exception {
         addHelper(root, null, newNode);
     }
 
-    private List<ProofHash> addHelper(Node currentNode, Node parentNode, LeafNode newNode) throws Exception {
+    private Node merge(Node nodeA, Node nodeB, Node prev, boolean noSwap) {
+        TreeNode result;
+        if (!noSwap) {
+            result = new TreeNode(nodeA, nodeB, prev, null, null, EMPTY_HASH, 0, 0);
+        } else {
+            result = new TreeNode(nodeB, nodeA, prev, null, null, EMPTY_HASH, 0, 0);
+        }
+        result.calculateAll();
+        return result;
+    }
+
+    private void addHelper(Node currentNode, Node parentNode, LeafNode newNode) throws Exception {
         if (currentNode instanceof LeafNode) {
             LeafNode node = (LeafNode) currentNode;
             TreeNode parent = (TreeNode) parentNode;
             if (parent.getLeft() == currentNode) {
                 if (node.getKey() == newNode.getKey()) {
                     parent.setLeft(newNode);
-                    parent.calculateHeights();
-                    parent.calculateMins();
+                    parent.calculateAll();
                 } else {
-                    // do something
+                    parent.setLeft(merge(node, newNode, parent, node.getKey() < newNode.getKey()));
+                    parent.calculateAll();
                 }
             } else if (parent.getRight() == currentNode) {
                 if (node.getKey() == newNode.getKey()) {
                     parent.setRight(newNode);
-                    parent.calculateHeights();
-                    parent.calculateMins();
+                    parent.calculateAll();
                 } else {
-                    // do something
+                    parent.setRight(merge(node, newNode, parent, node.getKey() < newNode.getKey()));
+                    parent.calculateAll();
                 }
             } else {
                 throw new Exception("Current Node is not left neither right child of the parent");
@@ -50,15 +63,15 @@ public class AVLTree {
             Integer rightMin = node.getRightMin();
             if (rightMin == null) {
                 node.setRight(newNode);
-                node.calculateHeights();
-                node.calculateMins();
+                node.calculateAll();
             } else {
                 if (newNode.getKey() < rightMin) {
-                    return addHelper(node.getLeft(), node, newNode);
+                    addHelper(node.getLeft(), node, newNode);
                 } else {
-                    return addHelper(node.getRight(), node, newNode);
+                    addHelper(node.getRight(), node, newNode);
                 }
             }
+            node.calculateAll();
         }
     }
 }

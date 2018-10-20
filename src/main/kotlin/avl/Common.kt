@@ -113,6 +113,17 @@ data class TreeNode(var left: Node?, var right: Node?, override var prev: Node?,
                     var rightMin: Int?, var allMin: Int?, override var hash: Hash,
                     var leftHeight: Int, var rightHeight: Int) : Node(prev, hash) {
 
+    fun calculateAll() {
+        calculateHash()
+        calculateHeights()
+        calculateMins()
+    }
+
+    fun calculateHash() {
+        hash = hashTreeNode(left, right)
+    }
+
+
     fun calculateHeights() {
         leftHeight = getHeight(left)
         rightHeight = getHeight(right)
