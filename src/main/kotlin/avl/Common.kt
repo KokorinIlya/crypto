@@ -18,9 +18,9 @@ data class Proof(val entries: List<ProofHash>, val heights: List<NodeHeightInfo>
 
         other as Proof
 
-        if (!Arrays.equals(entries, other.entries)) return false
-        if (!Arrays.equals(heights, other.heights)) return false
-        if (!Arrays.equals(directions, other.directions)) return false
+        if (entries != other.entries) return false
+        if (heights != other.heights) return false
+        if (directions != other.directions) return false
 
         return true
     }

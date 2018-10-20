@@ -56,9 +56,9 @@ public class AVLTree {
         if (node instanceof LeafNode) {
             LeafNode leaf = (LeafNode) node;
             ProofEntity proofEntity = new ProofEntity(
-                new ProofHash(leaf.getHash().getData()),
+                new ProofHash(leaf.getHash()),
                 new NodeHeightInfo(0, 0),
-                moveLeft ? Direction.Right : Direction.Left
+                moveLeft ? Direction.RIGHT : Direction.LEFT
             );
             if (justAns) {
                 result.add(proofEntity);
@@ -67,9 +67,9 @@ public class AVLTree {
             TreeNode tree = (TreeNode) node;
             if (justAns) {
                 ProofEntity proofEntity = new ProofEntity(
-                    new ProofHash(tree.getHash().getData()),
+                    new ProofHash(tree.getHash()),
                     new NodeHeightInfo(tree.getLeftHeight(), tree.getRightHeight()),
-                    moveLeft ? Direction.Right : Direction.Left
+                    moveLeft ? Direction.RIGHT : Direction.LEFT
                 );
                 result.add(proofEntity);
                 return result;
