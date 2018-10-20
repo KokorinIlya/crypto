@@ -1,5 +1,6 @@
 package avl
 
+import java.security.MessageDigest
 import java.util.*
 
 data class ProofHash(val data: ByteArray) {
@@ -60,7 +61,8 @@ data class LeafNode(val key: Int, val nextKey: Int?, val data: ByteArray, overri
     }
 }
 
-data class TreeNode(val left: Node?, val right: Node?, val hash: ByteArray, override val prev: Node?) : Node(prev) {
+data class TreeNode(val left: Node?, val right: Node?, val hash: ByteArray,
+                    override val prev: Node?, val rightMin: Int) : Node(prev) {
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -85,5 +87,11 @@ data class TreeNode(val left: Node?, val right: Node?, val hash: ByteArray, over
     }
 }
 
+val Hasher: MessageDigest = MessageDigest.getInstance("SHA-256")
+
+fun hashLeafNode(key: Int, value: ByteArray, nextKey: Int?): Hash {
+    val firstArray = ByteArray(4)
+
+}
 
 
