@@ -30,6 +30,7 @@ class AVLVerifier(startDigest: Digest) {
 
         for (i in 0 until size) {
             var smallRotationDone = false
+            var bigRotationDone = false
             if (i < size - 1) {
                 /*
                 a - (i + 1)-ая вершина
@@ -135,7 +136,7 @@ class AVLVerifier(startDigest: Digest) {
                         Поднимаемся по пути P -> b -> a
                         curHash не меняется, это остаётся P
                         direction[i + 1] не меняется, так как
-                        direction(b -> a) == direction(P -> b') == LEFT
+                        direction(b -> a) == direction(R -> b') == LEFT
                         proofElems[i + 1] меняется. Раньше это был брат b (это был R),
                         теперь это брат P (это a')
                         a' = TreeNode(Q, R)
@@ -164,7 +165,51 @@ class AVLVerifier(startDigest: Digest) {
             }
             if (i < size - 2 && !smallRotationDone) {
                 // Малый поворот ещё не совершался, можно попробовать сделать большой
+                /*
+                a - (i + 2)-ая вершина
+                b - (i + 1)-ая вершина
+                c - i-ая вершина
+                 */
+                val cLeftHeight = heights[i].leftHeight
+                val cRightHeight = heights[i].rightHeight
+
+                val bLeftHeight = heights[i + 1].leftHeight
+                val bRightHeight = heights[i + 1].rightHeight
+
+                val aLeftHeight = heights[i + 2].leftHeight
+                val aRightHeight = heights[i + 2].rightHeight
+
+                val cBalance = cLeftHeight - cRightHeight
+                val bBalance = bLeftHeight - bRightHeight
+                val aBalance = aLeftHeight - aRightHeight
+
+                val curDirection = directions[i]
+                if (aBalance == -2 && bBalance == 1 &&
+                        (cBalance == -1 || cBalance == 0 || cBalance == 1)) {
+                    bigRotationDone = true
+                    /*
+                    P = a.left
+                    Q = c.left
+                    R = c.right
+                    S = b.right
+                    b = a.right
+                    c = b.left
+                     */
+                    if (curDirection == Direction.LEFT) {
+                        /*
+                        Поднимаемся по пути Q -> c -> b -> a
+                        
+                         */
+                    }
+                }
                 // TODO - большие повороты
+            }
+            if (!smallRotationDone && !bigRotationDone) {
+                if (directions[i] == Direction.LEFT) {
+                    curHash = hashTreeNode(curHash, proofElems[i])
+                } else {
+                    curHash = hashTreeNode(proofElems[i], curHash)
+                }
             }
         }
         val result = curHash.data contentEquals newDigest.data
