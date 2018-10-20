@@ -106,17 +106,17 @@ data class TreeNode(var left: Node?, var right: Node?, override var prev: Node?,
         calculateMins()
     }
 
-    fun calculateHash() {
+    private fun calculateHash() {
         hash = hashTreeNode(left, right)
     }
 
 
-    fun calculateHeights() {
+    private fun calculateHeights() {
         leftHeight = getHeight(left)
         rightHeight = getHeight(right)
     }
 
-    fun calculateMins() {
+    private fun calculateMins() {
         rightMin = getRightMinHelper(right)
         val leftAllMin = getAllMinHelper(left)
         val rightAllMin = getAllMinHelper(right)
@@ -125,38 +125,30 @@ data class TreeNode(var left: Node?, var right: Node?, override var prev: Node?,
         } else leftAllMin ?: rightAllMin
     }
 
-    fun getAllMinHelper(node: Node?): Int? {
-        when (node) {
-            null -> return null
-            is LeafNode -> return node.key
-            is TreeNode -> return node.allMin
-            else -> return null
+    private fun getAllMinHelper(node: Node?): Int? {
+        return when (node) {
+            null -> null
+            is LeafNode -> node.key
+            is TreeNode -> node.allMin
+        }
+    }
+
+    private fun getRightMinHelper(node: Node?): Int? {
+        return when (node) {
+            null -> null
+            is LeafNode -> node.key
+            is TreeNode -> node.rightMin
         }
 
     }
 
-    fun getRightMinHelper(node: Node?): Int? {
-        if (node == null) {
-            return null
-        } else if (node is LeafNode) {
-            return node.key
-        } else if (node is TreeNode) {
-            return node.rightMin
+    private fun getHeight(node: Node?): Int {
+        return when (node) {
+            null -> 0
+            is LeafNode -> 1
+            is TreeNode -> maxOf(node.leftHeight, node.rightHeight)
         }
 
-        return null
-    }
-
-    fun getHeight(node: Node?): Int {
-        if (node == null) {
-            return 0
-        } else if (node is LeafNode) {
-            return 1
-        } else if (node is TreeNode) {
-            return maxOf(node.leftHeight, node.rightHeight)
-        }
-
-        return 0
     }
 }
 

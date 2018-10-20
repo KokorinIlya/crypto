@@ -22,6 +22,6 @@ class AVLVerifier(startDigest: Digest) {
         return curHash.data contentEquals curDigest.data
     }
 
-    
+
 
 }
