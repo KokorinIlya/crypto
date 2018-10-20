@@ -26,7 +26,7 @@ public class AVLTree {
     public Proof add(LeafNode newNode) throws Exception {
         addHelper(root, null, newNode);
         Proof proof = getProof(newNode.getKey());
-        balance(root);
+        root = (TreeNode) balance(root, newNode.getKey());
         return proof;
     }
 
@@ -99,8 +99,84 @@ public class AVLTree {
         return result;
     }
 
-    private void balance(Node node) {
-        // do something
+    private Node balance(Node node, int key) throws Exception {
+        if (node == null || node instanceof LeafNode) {
+            return node;
+        }
+        TreeNode tree = (TreeNode) node;
+        if (tree.getRightMin() == null) {
+            throw new Exception("YOU LOSE!");
+        }
+        if (key >= tree.getRightMin()) {
+            balance(tree.getRight(), key);
+            return balanceNode(node);
+        } else {
+            balance(tree.getLeft(), key);
+            return balanceNode(node);
+        }
+    }
+
+    private Node balanceNode(Node node) {
+        if (node == null || node instanceof LeafNode) {
+            return node;
+        }
+        TreeNode tree = (TreeNode) node;
+        tree.calculateAll();
+        int diff = getDiff(tree);
+        if (diff == -2) {
+            if (getDiff(tree.getRight()) <= 0) {
+                TreeNode a = tree;
+                TreeNode b = (TreeNode) tree.getRight();
+                a.setRight(b.getLeft());
+                b.setLeft(a);
+                TreeNode result = b;
+                result.setLeft(balanceNode(result.getLeft()));
+                return balanceNode(result);
+            } else {
+                TreeNode a = tree;
+                TreeNode b = (TreeNode) tree.getRight();
+                TreeNode c = (TreeNode) b.getLeft();
+                a.setRight(c.getLeft());
+                b.setLeft(c.getRight());
+                c.setLeft(a);
+                c.setRight(b);
+                TreeNode result = c;
+                result.setLeft(balanceNode(result.getLeft()));
+                result.setRight(balanceNode(result.getRight()));
+                return balanceNode(result);
+            }
+        } else {
+            if (getDiff(tree.getLeft()) >= 0) {
+                TreeNode a = tree;
+                TreeNode b = (TreeNode) tree.getLeft();
+                a.setLeft(b.getRight());
+                b.setRight(a);
+                TreeNode result = b;
+                result.setRight(balanceNode(result.getRight()));
+                return balanceNode(result);
+            } else {
+                TreeNode a = tree;
+                TreeNode b = (TreeNode) tree.getLeft();
+                TreeNode c = (TreeNode) b.getRight();
+                a.setLeft(c.getRight());
+                b.setRight(c.getLeft());
+                c.setRight(a);
+                c.setLeft(b);
+                TreeNode result = c;
+                result.setLeft(balanceNode(result.getLeft()));
+                result.setRight(balanceNode(result.getRight()));
+                return balanceNode(result);
+            }
+        }
+    }
+
+    private int getDiff(Node node) {
+        if (node == null || node instanceof LeafNode) {
+            return 0;
+        } else {
+            TreeNode tree = (TreeNode) node;
+            return tree.getLeftHeight() - tree.getRightHeight();
+        }
     }
 
     private Node merge(Node nodeA, Node nodeB, Node prev, boolean noSwap) {
