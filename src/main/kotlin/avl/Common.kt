@@ -20,6 +20,34 @@ data class ProofHash(val data: ByteArray) {
     }
 }
 
+data class NodeHeightInfo(val leftHeight: Int, val rightHeight: Int)
+
+enum class Direction {
+    Left, Right
+}
+
+data class Proof(val entries: Array<ProofHash>, val heights: Array<NodeHeightInfo>, val directions: Array<Direction>) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Proof
+
+        if (!Arrays.equals(entries, other.entries)) return false
+        if (!Arrays.equals(heights, other.heights)) return false
+        if (!Arrays.equals(directions, other.directions)) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = Arrays.hashCode(entries)
+        result = 31 * result + Arrays.hashCode(heights)
+        result = 31 * result + Arrays.hashCode(directions)
+        return result
+    }
+}
+
 data class Hash(val data: ByteArray) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -67,6 +95,7 @@ data class LeafNode(val key: Int, val nextKey: Int?, val data: LeafData,
 data class TreeNode(var left: Node?, var right: Node?, override var prev: Node?,
                     var rightMin: Int?, var allMin: Int?, override var hash: Hash,
                     var leftHeight: Int, var rightHeight: Int) : Node(prev, hash) {
+
 
     fun calculateHeights() {
         leftHeight = getHeight(left)
@@ -156,5 +185,6 @@ fun hashTreeNode(left: Node?, right: Node?): Hash {
     val pref2 = ByteArray(1) { i -> 2 }
     return Hash(Hasher.digest(pref1 + leftHash + pref2 + rightHash))
 }
+
 
 
