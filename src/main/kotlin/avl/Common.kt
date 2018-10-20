@@ -37,9 +37,9 @@ data class Hash(val data: ByteArray) {
     }
 }
 
-sealed class Node(open val prev: Node?)
+sealed class Node(open var prev: Node?)
 
-data class LeafNode(val key: Int, val nextKey: Int?, val data: ByteArray, override val prev: Node): Node(prev) {
+data class LeafNode(val key: Int, val nextKey: Int?, val data: ByteArray, override var prev: Node?): Node(prev) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -61,8 +61,8 @@ data class LeafNode(val key: Int, val nextKey: Int?, val data: ByteArray, overri
     }
 }
 
-data class TreeNode(val left: Node?, val right: Node?, val hash: ByteArray,
-                    override val prev: Node?, val rightMin: Int) : Node(prev) {
+data class TreeNode(var left: Node?, var right: Node?, var hash: ByteArray,
+                    override var prev: Node?, var rightMin: Int) : Node(prev) {
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -89,8 +89,13 @@ data class TreeNode(val left: Node?, val right: Node?, val hash: ByteArray,
 
 val Hasher: MessageDigest = MessageDigest.getInstance("SHA-256")
 
+fun intToByteArray(x: Int): ByteArray {
+    val result = ByteArray(4)
+    result[0] =
+}
+
 fun hashLeafNode(key: Int, value: ByteArray, nextKey: Int?): Hash {
-    val firstArray = ByteArray(4)
+    val keyBytes = ByteArray(4)
 
 }
 
