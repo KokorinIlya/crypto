@@ -6,7 +6,7 @@ class AVLVerifier(startDigest: Digest) {
 
     private var curDigest = startDigest
 
-    fun proveSearch(key: Int, value: LeafData, nextKey: Int?, proof: Proof): Boolean {
+    fun verifySearch(key: Int, value: LeafData, nextKey: Int?, proof: Proof): Boolean {
         var curHash = hashLeafNode(key, value, nextKey)
         val size = proof.entries.size
         for (i in 0 until size) {
@@ -21,197 +21,180 @@ class AVLVerifier(startDigest: Digest) {
         return curHash.data contentEquals curDigest.data
     }
 
-    fun proveInsertion(key: Int, value: LeafData, nextKey: Int?, proof: Proof, newDigest: Digest): Boolean {
+    fun verifyInsertion(key: Int, value: LeafData, nextKey: Int?, proof: Proof, newDigest: Digest): Boolean {
         var curHash = hashLeafNode(key, value, nextKey)
         val size = proof.heights.size
+
         val heights = proof.heights
         val directions = proof.directions
         val proofElems = proof.entries
 
-        for (i in 0 until size) {
-            var smallRotationDone = false
-            var bigRotationDone = false
-            if (i < size - 1) {
+        /*
+        Массивы отражают путь от 0 (листа) к корню (size), а надо наоборот
+         */
+        heights.reverse()
+        directions.reverse()
+        proofElems.reverse()
+        /*
+        Всего на пути size + 1 вершин с номерами с 0 по size включительно
+        Вершина с i-ым номером - это вершина с расстоянием до корня, равным i.
+        Нулевая вершина - корень. size-ая вершина - лист, от которого мы поднимаемся.
+
+        directions[i] - направление поднятия от (i + 1)-ой верншины к i-ой.
+        proofElement[i] - хеш брата (i + 1)-ой вершины
+        heights[i] - высоты левого и правого поддеревьев i-ой вершины на пути
+        (то есть  высоты поддеревьев (i + 1)-ой вершины и её брата)
+         */
+
+        for (curIndex in size downTo 1) {
+            var smallRotationPerformed = false
+            var bigRotationPerformed = false
+            if (curIndex >= 2) {
                 /*
-                a - (i + 1)-ая вершина
-                b - i-ая вершина
+                b - (i - 1)-ая вершина
+                a - (i - 2)-ая вершина
                  */
+                val bIndex = curIndex - 1
+                val aIndex = curIndex - 2
 
-                val bLeftHeight = heights[i].leftHeight
-                val bRightHeight = heights[i].rightHeight
+                val aLeftHeight = heights[aIndex].leftHeight
+                val aRightHeight = heights[aIndex].rightHeight
 
-                val aLeftHeight = heights[i + 1].leftHeight
-                val aRightHeight = heights[i + 1].rightHeight
+                val bLeftHeight = heights[bIndex].leftHeight
+                val bRightHeight = heights[bIndex].rightHeight
 
-                val bBalance = bLeftHeight - bRightHeight
                 val aBalance = aLeftHeight - aRightHeight
-
-                val curDirection = directions[i]
+                val bBalance = bLeftHeight - bRightHeight
 
                 if (aBalance == -2 && (bBalance == -1 || bBalance == 0)) {
                     /*
-                    P = a.left
-                    Q = b.left
-                    R = b.right
-                    b = a.right
                     Малый левый поворот
-                    */
-                    smallRotationDone = true
-                    if (curDirection == Direction.RIGHT) {
+                     */
+                    smallRotationPerformed = true
+                    if (directions[curIndex - 1] == Direction.RIGHT) {
                         /*
-                        Мы поднимаемся по пути R -> b -> a
-                        curHash не меняется (это хеш R)
-                        proof[i + 1] - хеш брата R (раньше это был хеш брата b, которым был P)
-                        Теперь брат R - a'
-                        a' = TreeNode(P, Q)
-                        direction[i + 1] не поменяется, так как
-                        direction(R -> b') == direction(b -> a) == Direction.RIGHT
+                        Идём по направлению R -> b -> a
                          */
-                        require(directions[i + 1] == Direction.RIGHT)
-                        val Q = proofElems[i]
-                        val P = proofElems[i + 1]
-                        proofElems[i + 1] = hashTreeNode(P, Q)
+                        val P = proofElems[curIndex - 2]
+                        val Q = proofElems[curIndex - 1]
+                        // R = curHash, не меняется
+
+                        require(directions[curIndex - 2] == Direction.RIGHT)
+
+                        proofElems[curIndex - 2] = hashTreeNode(P, Q)
                     } else {
                         /*
-                        Мы поднимаемся по пути Q -> b -> a
-                        curHash меняется, теперь это хеш a'
-                        a' = TreeNode(P, Q)
-                        direction[i + 1] меняется на противоположный
-                        direction(b -> a) был RIGHT, direction(a' -> b') стал LEFT
-                        proof[i + 1] меняется, тк раньше это был хеш брата b (это P),
-                        теперь это хеш брата a' (это R)
+                        Идём по направлению Q -> b -> a
                          */
-                        require(directions[i + 1] == Direction.RIGHT)
-                        directions[i + 1] = Direction.LEFT
+                        val P = proofElems[curIndex - 2]
                         val Q = curHash
-                        val P = proofElems[i + 1]
-                        val R = proofElems[i]
+                        val R = proofElems[curIndex - 1]
+
+                        require(directions[curIndex - 2] == Direction.RIGHT)
+
+                        proofElems[curIndex - 2] = R
+                        directions[curIndex - 2] = Direction.LEFT
                         curHash = hashTreeNode(P, Q)
-                        proofElems[i + 1] = R
                     }
+
                     /*
-                    Пересчитаем heights[i + 1] = heights(b')
-                    Теперь height(b'_l) = height(a') = max(height(P, Q) + 1)
-                    height(b'_r) = height(R)
-                    height(R) = height(b.right)
-                    height(P) = height(a.left)
-                    height(Q) = height(b.left)
+                    Пересчёт высоты
                      */
-                    val heightR = heights[i].rightHeight
-                    val heightP = heights[i + 1].leftHeight
-                    val heightQ = heights[i].leftHeight
-                    heights[i + 1] = NodeHeightInfo(
-                            maxOf(heightP, heightQ) + 1,
-                            heightR
-                    )
+                    val pHeight = aLeftHeight
+                    val qHeight = bLeftHeight
+                    val rHeight = bRightHeight
+                    val newAHeight = maxOf(pHeight, qHeight) + 1
+                    // высота a'
+                    heights[curIndex - 1] = NodeHeightInfo(pHeight, qHeight)
+                    // высота b'
+                    heights[curIndex - 2] = NodeHeightInfo(newAHeight, rHeight)
                 } else if (aBalance == 2 && (bBalance == -1 || bBalance == 0)) {
                     /*
-                    P = b.left
-                    Q = b.right
-                    R = a.right
-                    b = a.left
-                    Малый правый повторот
+                    Малый правый поворот
                      */
-                    smallRotationDone = true
-                    if (curDirection == Direction.RIGHT) {
+                    smallRotationPerformed = true
+                    if (directions[curIndex - 1] == Direction.LEFT) {
                         /*
-                        Поднимаемся по пути Q -> b -> a
-                        curHash меняется, теперь это хеш a'
-                        a' = TreeNode(Q, R)
-                        direction[i + 1] поменялся на противоположное значение,
-                        так как direction(b -> a) был равен LEFT,
-                        но direction(a' -> b') стал RIGHT
-                        proofElems[i + 1] меняется, раньше это был брат b (это был R),
-                        теперь это брат a' (это P)
+                        Идём по пути P -> b -> a
                          */
-                        require(directions[i + 1] == Direction.LEFT)
-                        directions[i + 1] == Direction.RIGHT
-                        val P = proofElems[i]
-                        val Q = curHash
-                        val R = proofElems[i + 1]
-                        curHash = hashTreeNode(Q, R)
-                        proofElems[i + 1] = P
+                        require(directions[curIndex - 2] == Direction.LEFT)
+                        // P = curHash, не меняется
+                        val Q = proofElems[curIndex - 1]
+                        val R = proofElems[curIndex - 2]
+
+                        proofElems[curIndex - 2] = hashTreeNode(Q, R)
                     } else {
                         /*
-                        Поднимаемся по пути P -> b -> a
-                        curHash не меняется, это остаётся P
-                        direction[i + 1] не меняется, так как
-                        direction(b -> a) == direction(R -> b') == LEFT
-                        proofElems[i + 1] меняется. Раньше это был брат b (это был R),
-                        теперь это брат P (это a')
-                        a' = TreeNode(Q, R)
+                        Идём по пути Q -> b -> a
                          */
-                        require(directions[i + 1] == Direction.LEFT)
-                        val Q = proofElems[i]
-                        val R = proofElems[i + 1]
-                        proofElems[i + 1] == hashTreeNode(Q, R)
+                        require(directions[curIndex - 2] == Direction.LEFT)
+                        directions[curIndex - 2] = Direction.RIGHT
+
+                        val P = proofElems[curIndex - 1]
+                        val Q = curHash
+                        val R = proofElems[curIndex - 2]
+
+                        curHash = hashTreeNode(Q, R)
+                        proofElems[curIndex - 2] = P
                     }
+
                     /*
-                    Пересчитаем heights[i + 1] == height(b')
-                    height(b'.l) == height(P)
-                    height(b'.r) = height(a') = max(height(Q), height(R)) + 1
-                    height(P) = height(b.left)
-                    height(Q) = height(b.right)
-                    height(R) = height(a.right)
+                    Пересчёт высоты
                      */
-                    val heightP = heights[i].leftHeight
-                    val heightQ = heights[i].rightHeight
-                    val heightR = heights[i + 1].rightHeight
-                    heights[i + 1] = NodeHeightInfo(
-                            heightP,
-                            maxOf(heightQ, heightR) + 1
-                    )
+
+                    val pHeight = bLeftHeight
+                    val qHeight = bRightHeight
+                    val rHeight = aRightHeight
+                    val newAHeight = maxOf(qHeight, rHeight) + 1
+                    // высота a'
+                    heights[curIndex - 1] = NodeHeightInfo(qHeight, rHeight)
+                    // высота b'
+                    heights[curIndex - 2] = NodeHeightInfo(pHeight, newAHeight)
                 }
             }
-            if (i < size - 2 && !smallRotationDone) {
-                // Малый поворот ещё не совершался, можно попробовать сделать большой
+            if (curIndex >= 3 && !smallRotationPerformed) {
                 /*
-                a - (i + 2)-ая вершина
-                b - (i + 1)-ая вершина
-                c - i-ая вершина
+                Малое вращение не производилось, можно провести большое
                  */
-                val cLeftHeight = heights[i].leftHeight
-                val cRightHeight = heights[i].rightHeight
+                val aIndex = curIndex - 3
+                val bIndex = curIndex - 2
+                val cIndex = curIndex - 1
 
-                val bLeftHeight = heights[i + 1].leftHeight
-                val bRightHeight = heights[i + 1].rightHeight
+                val aLeftHeight = heights[aIndex].leftHeight
+                val aRightHeight = heights[aIndex].rightHeight
 
-                val aLeftHeight = heights[i + 2].leftHeight
-                val aRightHeight = heights[i + 2].rightHeight
+                val bLeftHeight = heights[bIndex].leftHeight
+                val bRightHeight = heights[bIndex].rightHeight
 
-                val cBalance = cLeftHeight - cRightHeight
-                val bBalance = bLeftHeight - bRightHeight
+                val cLeftHeight = heights[cIndex].leftHeight
+                val cRightHeight = heights[cIndex].rightHeight
+
                 val aBalance = aLeftHeight - aRightHeight
+                val bBalance = bLeftHeight - bRightHeight
+                val cBalance = cLeftHeight - cRightHeight
 
-                val curDirection = directions[i]
-                if (aBalance == -2 && bBalance == 1 &&
-                        (cBalance == -1 || cBalance == 0 || cBalance == 1)) {
-                    bigRotationDone = true
-                    /*
-                    P = a.left
-                    Q = c.left
-                    R = c.right
-                    S = b.right
-                    b = a.right
-                    c = b.left
-                     */
-                    if (curDirection == Direction.LEFT) {
-                        /*
-                        Поднимаемся по пути Q -> c -> b -> a
-                        
-                         */
-                    }
-                }
-                // TODO - большие повороты
+                // TODO: большие повороты
             }
-            if (!smallRotationDone && !bigRotationDone) {
-                if (directions[i] == Direction.LEFT) {
-                    curHash = hashTreeNode(curHash, proofElems[i])
+            if (!smallRotationPerformed && !bigRotationPerformed) {
+                /*
+                Повороты не производились
+                Пересчитаем хеш и высоту
+                 */
+                val curHeight = if (curIndex == size) 0 else
+                    maxOf(heights[curIndex].leftHeight, heights[curIndex].rightHeight) + 1
+                if (directions[curIndex - 1] == Direction.LEFT) {
+                    curHash = hashTreeNode(curHash, proofElems[curIndex - 1])
+                    val neighbourHeight = heights[curIndex - 1].rightHeight
+                    heights[curIndex - 1] = NodeHeightInfo(curHeight, neighbourHeight)
                 } else {
-                    curHash = hashTreeNode(proofElems[i], curHash)
+                    curHash = hashTreeNode(proofElems[curIndex - 1], curHash)
+                    val neighbourHeight = heights[curIndex - 1].leftHeight
+                    heights[curIndex - 1] = NodeHeightInfo(neighbourHeight, curHeight)
                 }
             }
         }
+
+
         val result = curHash.data contentEquals newDigest.data
         if (result) {
             curDigest = newDigest
