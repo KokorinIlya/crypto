@@ -2,8 +2,7 @@ package avl
 
 import java.security.MessageDigest
 import java.util.*
-
-data class ProofHash(val data: Hash)
+import kotlin.collections.ArrayList
 
 data class NodeHeightInfo(val leftHeight: Int, val rightHeight: Int)
 
@@ -11,7 +10,13 @@ enum class Direction {
     LEFT, RIGHT
 }
 
-data class Proof(val entries: List<ProofHash>, val heights: List<NodeHeightInfo>, val directions: List<Direction>) {
+data class Proof(val entries: MutableList<Hash>,
+                 val heights: MutableList<NodeHeightInfo>, val directions: MutableList<Direction>) {
+
+    init {
+        require(entries.size == heights.size && heights.size == directions.size)
+    }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -33,7 +38,7 @@ data class Proof(val entries: List<ProofHash>, val heights: List<NodeHeightInfo>
     }
 }
 
-data class ProofEntity(val entry: ProofHash, val height: NodeHeightInfo, val direction: Direction)
+data class ProofEntity(val entry: Hash, val height: NodeHeightInfo, val direction: Direction)
 
 data class Hash(val data: ByteArray) {
     override fun equals(other: Any?): Boolean {

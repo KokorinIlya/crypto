@@ -7,7 +7,6 @@ import avl.Node;
 import avl.NodeHeightInfo;
 import avl.Proof;
 import avl.ProofEntity;
-import avl.ProofHash;
 import avl.TreeNode;
 
 import java.util.ArrayList;
@@ -37,7 +36,7 @@ public class AVLTree {
 
     private Proof getProof(int key) throws Exception {
         List<ProofEntity> almostProof = getProofHelper(root, key, false, false);
-        List<ProofHash> entries = new ArrayList<ProofHash>();
+        List<Hash> entries = new ArrayList<Hash>();
         List<NodeHeightInfo> heightInfos = new ArrayList<NodeHeightInfo>();
         List<Direction> directions = new ArrayList<Direction>();
         for (ProofEntity entity : almostProof) {
@@ -56,7 +55,7 @@ public class AVLTree {
         if (node instanceof LeafNode) {
             LeafNode leaf = (LeafNode) node;
             ProofEntity proofEntity = new ProofEntity(
-                new ProofHash(leaf.getHash()),
+                leaf.getHash(),
                 new NodeHeightInfo(0, 0),
                 moveLeft ? Direction.RIGHT : Direction.LEFT
             );
@@ -67,7 +66,7 @@ public class AVLTree {
             TreeNode tree = (TreeNode) node;
             if (justAns) {
                 ProofEntity proofEntity = new ProofEntity(
-                    new ProofHash(tree.getHash()),
+                    tree.getHash(),
                     new NodeHeightInfo(tree.getLeftHeight(), tree.getRightHeight()),
                     moveLeft ? Direction.RIGHT : Direction.LEFT
                 );
