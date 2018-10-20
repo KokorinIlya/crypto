@@ -1,8 +1,12 @@
 package com.avl.tree;
 
+import avl.Direction;
 import avl.Hash;
 import avl.LeafNode;
 import avl.Node;
+import avl.NodeHeightInfo;
+import avl.Proof;
+import avl.ProofEntity;
 import avl.ProofHash;
 import avl.TreeNode;
 
@@ -16,12 +20,82 @@ public class AVLTree {
     private TreeNode root = null;
 
     public AVLTree() {
-
         root = new TreeNode(null, null, null, null, null, EMPTY_HASH, 0, 0);
     }
 
-    public void add(LeafNode newNode) throws Exception {
+    public Proof add(LeafNode newNode) throws Exception {
         addHelper(root, null, newNode);
+        Proof proof = getProof(newNode.getKey());
+        balance(root);
+        return proof;
+    }
+
+    private Proof getProof(int key) throws Exception {
+        List<ProofEntity> almostProof = getProofHelper(root, key, false, false);
+        List<ProofHash> entries = new ArrayList<ProofHash>();
+        List<NodeHeightInfo> heightInfos = new ArrayList<NodeHeightInfo>();
+        List<Direction> directions = new ArrayList<Direction>();
+        for (ProofEntity entity : almostProof) {
+            entries.add(entity.getEntry());
+            heightInfos.add(entity.getHeight());
+            directions.add(entity.getDirection());
+        }
+        return new Proof(entries, heightInfos, directions);
+    }
+
+    private List<ProofEntity> getProofHelper(Node node, int key, boolean justAns, boolean moveLeft) throws Exception {
+        List<ProofEntity> result = new ArrayList<ProofEntity>();
+        if (node == null) {
+            throw new Exception("YOUR TREE IS NOT GOOD, BRO!");
+        }
+        if (node instanceof LeafNode) {
+            LeafNode leaf = (LeafNode) node;
+            ProofEntity proofEntity = new ProofEntity(
+                new ProofHash(leaf.getHash().getData()),
+                new NodeHeightInfo(0, 0),
+                moveLeft ? Direction.Right : Direction.Left
+            );
+            if (justAns) {
+                result.add(proofEntity);
+            }
+        } else if (node instanceof TreeNode) {
+            TreeNode tree = (TreeNode) node;
+            if (justAns) {
+                ProofEntity proofEntity = new ProofEntity(
+                    new ProofHash(tree.getHash().getData()),
+                    new NodeHeightInfo(tree.getLeftHeight(), tree.getRightHeight()),
+                    moveLeft ? Direction.Right : Direction.Left
+                );
+                result.add(proofEntity);
+                return result;
+            }
+            Integer rightMin = tree.getRightMin();
+            if (rightMin == null) {
+                throw new Exception("YOU TREE IS REALLY BAD, BRO!");
+            } else if (key >= rightMin) {
+                List<ProofEntity> leftPart = getProofHelper(tree.getLeft(), key, true, true);
+                List<ProofEntity> rightPart = getProofHelper(tree.getRight(), key, false, false);
+                if (leftPart.size() != 1) {
+                    throw new Exception("Invalid sizes when key >= rightMin");
+                }
+                rightPart.add(leftPart.get(0));
+                result = rightPart;
+            } else {
+                List<ProofEntity> leftPart = getProofHelper(tree.getLeft(), key, false, true);
+                List<ProofEntity> rightPart = getProofHelper(tree.getRight(), key, true, false);
+                if (rightPart.size() != 1) {
+                    throw new Exception("Invalid sizes when key < rightMin");
+                }
+                leftPart.add(rightPart.get(0));
+                result = leftPart;
+            }
+        }
+
+        return result;
+    }
+
+    private void balance(Node node) {
+        // do something
     }
 
     private Node merge(Node nodeA, Node nodeB, Node prev, boolean noSwap) {

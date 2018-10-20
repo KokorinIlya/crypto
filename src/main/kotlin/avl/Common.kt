@@ -26,7 +26,7 @@ enum class Direction {
     Left, Right
 }
 
-data class Proof(val entries: Array<ProofHash>, val heights: Array<NodeHeightInfo>, val directions: Array<Direction>) {
+data class Proof(val entries: List<ProofHash>, val heights: List<NodeHeightInfo>, val directions: List<Direction>) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -47,6 +47,8 @@ data class Proof(val entries: Array<ProofHash>, val heights: Array<NodeHeightInf
         return result
     }
 }
+
+data class ProofEntity(val entry: ProofHash, val height: NodeHeightInfo, val direction: Direction)
 
 data class Hash(val data: ByteArray) {
     override fun equals(other: Any?): Boolean {
