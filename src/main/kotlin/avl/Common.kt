@@ -26,9 +26,9 @@ data class Proof(val entries: List<ProofHash>, val heights: List<NodeHeightInfo>
     }
 
     override fun hashCode(): Int {
-        var result = Arrays.hashCode(entries)
-        result = 31 * result + Arrays.hashCode(heights)
-        result = 31 * result + Arrays.hashCode(directions)
+        var result = entries.hashCode()
+        result = 31 * result + heights.hashCode()
+        result = 31 * result + directions.hashCode()
         return result
     }
 }
