@@ -30,6 +30,11 @@ public class AVLTree {
         return proof;
     }
 
+    public Proof find(int key) throws Exception {
+        // Нужно еще не забыть, что ключа в дереве то мозжет и не быть!!!
+        return getProof(key);
+    }
+
     private Proof getProof(int key) throws Exception {
         List<ProofEntity> almostProof = getProofHelper(root, key, false, false);
         List<ProofHash> entries = new ArrayList<ProofHash>();
