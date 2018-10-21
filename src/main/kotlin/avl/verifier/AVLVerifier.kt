@@ -104,8 +104,6 @@ class AVLVerifier(startDigest: Digest) {
                     val qHeight = bLeftHeight
                     val rHeight = bRightHeight
                     val newAHeight = maxOf(pHeight, qHeight) + 1
-                    // высота a'
-                    heights[curIndex - 1] = NodeHeightInfo(pHeight, qHeight)
                     // высота b'
                     heights[curIndex - 2] = NodeHeightInfo(newAHeight, rHeight)
                 } else if (aBalance == 2 && (bBalance == -1 || bBalance == 0)) {
@@ -146,8 +144,6 @@ class AVLVerifier(startDigest: Digest) {
                     val qHeight = bRightHeight
                     val rHeight = aRightHeight
                     val newAHeight = maxOf(qHeight, rHeight) + 1
-                    // высота a'
-                    heights[curIndex - 1] = NodeHeightInfo(qHeight, rHeight)
                     // высота b'
                     heights[curIndex - 2] = NodeHeightInfo(pHeight, newAHeight)
                 }
@@ -173,7 +169,75 @@ class AVLVerifier(startDigest: Digest) {
                 val bBalance = bLeftHeight - bRightHeight
                 val cBalance = cLeftHeight - cRightHeight
 
-                // TODO: большие повороты
+                if (aBalance == -2 && bBalance == 1 && (cBalance == -1 || cBalance == 0 || cBalance == 1)) {
+                    /*
+                    Большой левый поворот
+                     */
+                    bigRotationPerformed = true
+                    if (directions[curIndex - 1] == Direction.LEFT) {
+                        /*
+                        Идём по пути Q -> c -> b -> a
+                         */
+                        require(directions[curIndex - 2] == Direction.LEFT)
+                        require(directions[curIndex - 3] == Direction.RIGHT)
+
+                        val P = proofElems[curIndex - 3]
+                        // Q = curHash, не меняется
+                        val R = proofElems[curIndex - 1]
+                        val S = proofElems[curIndex - 2]
+
+                        directions[curIndex - 2] = Direction.RIGHT
+                        directions[curIndex - 3] = Direction.LEFT
+
+                        proofElems[curIndex - 2] = P
+                        proofElems[curIndex - 3] = hashTreeNode(R, S)
+
+                        /*
+                        Пересчитаем высоту
+                        */
+
+                        val pHeight = aLeftHeight
+                        val qHeight = cLeftHeight
+                        val rHeight = cRightHeight
+                        val sHeight = bRightHeight
+                        val newAHeight = maxOf(pHeight, qHeight) + 1
+                        val newBHeight = maxOf(rHeight, sHeight) + 1
+                        // (i - 2)-ая вершина это a'
+                        heights[curIndex - 2] = NodeHeightInfo(pHeight, qHeight)
+                        // (i - 3)-я вершина это c'
+                        heights[curIndex - 3] = NodeHeightInfo(newAHeight, newBHeight)
+                    } else {
+                        /*
+                        Идём по пути R -> c -> b -> a
+                         */
+                        require(directions[curIndex - 2] == Direction.LEFT)
+                        require(directions[curIndex - 3] == Direction.RIGHT)
+
+                        val P = proofElems[curIndex - 3]
+                        val Q = proofElems[curIndex - 1]
+                        // R = curHash, не меняется
+                        val S = proofElems[curIndex - 2]
+
+                        proofElems[curIndex - 2] = S
+                        proofElems[curIndex - 3] = hashTreeNode(P, Q)
+
+                        val pHeight = aLeftHeight
+                        val qHeight = cLeftHeight
+                        val rHeight = cRightHeight
+                        val sHeight = bRightHeight
+                        val newAHeight = maxOf(pHeight, qHeight) + 1
+                        val newBHeight = maxOf(rHeight, sHeight) + 1
+                        // (i - 2)-ая вершина это b'
+                        heights[curIndex - 2] = NodeHeightInfo(rHeight, sHeight)
+                        // (i - 3)-я вершина это c'
+                        heights[curIndex - 3] = NodeHeightInfo(newAHeight, newBHeight)
+                    }
+
+                } else if (aBalance == 2 && bBalance == 1 &&
+                        (cBalance == -1 || cBalance == 0 || cBalance == 1)) {
+                    bigRotationPerformed = true
+                    // TODO: правый большой поворот
+                }
             }
             if (!smallRotationPerformed && !bigRotationPerformed) {
                 /*
