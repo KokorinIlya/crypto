@@ -96,11 +96,11 @@ data class LeafData(val data: ByteArray) {
 
 sealed class Node(open var prev: Node?, open var hash: Hash)
 
-data class LeafNode(val key: Int, val nextKey: Int?, val data: LeafData,
+data class LeafNode(val key: Int, var nextKey: LeafNode?, var prevKey: LeafNode?, val data: LeafData,
                     override var prev: Node?, override var hash: Hash): Node(prev, hash) {
 
-    constructor(key: Int, nextKey: Int?, data: LeafData, prev: Node?) : this(
-            key, nextKey, data, prev, hashLeafNode(key, data, nextKey)
+    constructor(key: Int, nextKey: LeafNode?, prevKey: LeafNode?, data: LeafData, prev: Node?) : this(
+            key, nextKey, prevKey, data, prev, hashLeafNode(key, data, nextKey)
     )
 }
 
@@ -197,9 +197,9 @@ fun intToByteArray(x: Int): ByteArray {
     return result
 }
 
-fun hashLeafNode(key: Int, value: LeafData, nextKey: Int?): Hash {
+fun hashLeafNode(key: Int, value: LeafData, nextKey: LeafNode?): Hash {
     val keyBytes = intToByteArray(key)
-    val nextKeyBytes = intToByteArray(nextKey ?: Integer.MAX_VALUE)
+    val nextKeyBytes = intToByteArray(nextKey?.key ?: Integer.MAX_VALUE)
     val pref = ByteArray(1){ i -> 0 }
     return Hash(pref + Hasher.digest(keyBytes + nextKeyBytes + value.data))
 }

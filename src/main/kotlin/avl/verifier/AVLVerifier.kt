@@ -6,7 +6,7 @@ class AVLVerifier(startDigest: Digest) {
 
     private var curDigest = startDigest
 
-    fun verifySearch(key: Int, value: LeafData, nextKey: Int?, proof: Proof): Boolean {
+    fun verifySearch(key: Int, value: LeafData, nextKey: LeafNode?, proof: Proof): Boolean {
         var curHash = hashLeafNode(key, value, nextKey)
         val size = proof.entries.size
         for (i in 0 until size) {
@@ -21,7 +21,7 @@ class AVLVerifier(startDigest: Digest) {
         return curHash.data contentEquals curDigest.data
     }
 
-    fun verifyChange(key: Int, value: LeafData, nextKey: Int?, proof: Proof, newDigest: Digest): Boolean {
+    fun verifyChange(key: Int, value: LeafData, nextKey: LeafNode?, proof: Proof, newDigest: Digest): Boolean {
         var curHash = hashLeafNode(key, value, nextKey)
         val size = proof.heights.size
 
