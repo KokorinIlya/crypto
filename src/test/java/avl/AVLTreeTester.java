@@ -52,4 +52,38 @@ public class AVLTreeTester {
         AVLVerifier verifier = new AVLVerifier(new Digest(avlTree.getRootHash().getData()));
         assertFalse(verifier.verifySearch(22, pair.getSecond(), pair.getThird(), pair.getFirst()));
     }
+
+    @Test
+    public void simpleAdditionVerification() throws Exception {
+        AVLTree avlTree = new AVLTree();
+        AVLVerifier verifier = new AVLVerifier(new Digest(avlTree.getRootHash().getData()));
+        byte[] b = new byte[]{2, 4, 6, 0, 1};
+        TreeResponse<Proof, LeafData, LeafNode> pair = avlTree.add(10, b);
+        Digest digest = new Digest(avlTree.getRootHash().getData());
+        assertTrue(verifier.verifyChange(10, pair.getSecond(), pair.getThird(), pair.getFirst(), digest));
+    }
+
+    @Test
+    public void incorrectSimpleAdditionVerification() throws Exception {
+        AVLTree avlTree = new AVLTree();
+        AVLVerifier verifier = new AVLVerifier(new Digest(avlTree.getRootHash().getData()));
+        byte[] b = new byte[]{2, 4, 6, 0, 1};
+        TreeResponse<Proof, LeafData, LeafNode> pair = avlTree.add(10, b);
+        Digest digest = new Digest(avlTree.getRootHash().getData());
+        assertFalse(verifier.verifyChange(15, pair.getSecond(), pair.getThird(), pair.getFirst(), digest));
+    }
+
+    @Test
+    public void multipleAdditionVerification() throws Exception {
+        AVLTree avlTree = new AVLTree();
+        AVLVerifier verifier = new AVLVerifier(new Digest(avlTree.getRootHash().getData()));
+        byte[] b = new byte[]{2, 4, 6, 0, 1};
+        TreeResponse<Proof, LeafData, LeafNode> pair = avlTree.add(10, b);
+        Digest digest = new Digest(avlTree.getRootHash().getData());
+        assertTrue(verifier.verifyChange(10, pair.getSecond(), pair.getThird(), pair.getFirst(), digest));
+
+        TreeResponse<Proof, LeafData, LeafNode> p2 = avlTree.add(15, b);
+        Digest digest2 = new Digest(avlTree.getRootHash().getData());
+        assertTrue(verifier.verifyChange(15, p2.getSecond(), p2.getThird(), p2.getFirst(), digest2));
+    }
 }
