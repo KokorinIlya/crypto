@@ -102,6 +102,10 @@ data class LeafNode(val key: Int, var nextKey: LeafNode?, var prevKey: LeafNode?
     constructor(key: Int, nextKey: LeafNode?, prevKey: LeafNode?, data: LeafData, prev: Node?) : this(
             key, nextKey, prevKey, data, prev, hashLeafNode(key, data, nextKey)
     )
+
+    fun recalcHash() {
+        hash = hashLeafNode(key, data, nextKey)
+    }
 }
 
 data class TreeNode(var left: Node?, var right: Node?, override var prev: Node?,
