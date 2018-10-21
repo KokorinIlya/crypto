@@ -21,6 +21,7 @@ class AVLVerifier(startDigest: Digest) {
         for (i in (size - 1) downTo 0) {
             val treeNodeHash = proof.entries[i]
             val curDirection = proof.directions[i]
+            println("curHash $curHash curDir $curDirection treehash $treeNodeHash")
             curHash = if (curDirection == Direction.LEFT) {
                 hashTreeNode(curHash, treeNodeHash)
             } else {
