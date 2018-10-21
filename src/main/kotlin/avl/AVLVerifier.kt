@@ -1,5 +1,7 @@
 package avl
 
+import java.util.*
+
 class AVLVerifier(startDigest: Digest) {
 
     private var curDigest = startDigest
@@ -26,6 +28,10 @@ class AVLVerifier(startDigest: Digest) {
         val heights = proof.heights
         val directions = proof.directions
         val proofElems = proof.entries
+
+        println(heights)
+        println(directions)
+        println(proofElems)
 
         /*
         Массивы отражают путь от 0 (листа) к корню (size), а надо наоборот
@@ -68,6 +74,7 @@ class AVLVerifier(startDigest: Digest) {
                     /*
                     Малый левый поворот
                      */
+                    println("SMALL LEFT ROTATION")
                     smallRotationPerformed = true
                     if (directions[curIndex - 1] == Direction.RIGHT) {
                         /*
@@ -112,6 +119,7 @@ class AVLVerifier(startDigest: Digest) {
                     /*
                     Малый правый поворот
                      */
+                    println("SMALL RIGHT ROTATION")
                     smallRotationPerformed = true
                     if (directions[curIndex - 1] == Direction.LEFT) {
                         /*
@@ -179,6 +187,7 @@ class AVLVerifier(startDigest: Digest) {
                     /*
                     Большой левый поворот
                      */
+                    println("BIG LEFT ROTATION")
                     bigRotationPerformed = true
                     if (directions[curIndex - 1] == Direction.LEFT) {
                         /*
@@ -249,6 +258,7 @@ class AVLVerifier(startDigest: Digest) {
 
                 } else if (aBalance == 2 && bBalance == 1 &&
                         (cBalance == -1 || cBalance == 0 || cBalance == 1)) {
+                    println("BIG RIGHT ROTATION")
                     bigRotationPerformed = true
                     /*
                     Большой правый поворот
@@ -348,6 +358,9 @@ class AVLVerifier(startDigest: Digest) {
         val result = curHash.data contentEquals newDigest.data
         if (result) {
             curDigest = newDigest
+        } else {
+            println(Base64.getEncoder().encodeToString(curHash.data))
+            println(Base64.getEncoder().encodeToString(newDigest.data))
         }
         return result
     }

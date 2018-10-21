@@ -31,6 +31,9 @@ public class AVLTree {
         LeafNode newNode = new LeafNode(key, null, null, new LeafData(data), null);
         addHelper(root, null, newNode);
         TreeResponse<Proof, LeafData, LeafNode> result = find(key);
+        if (key == 15) {
+            System.out.println("BEFORE: " + this);
+        }
         root = (TreeNode) balance(root, newNode.getKey());
         return result;
     }
