@@ -21,7 +21,7 @@ class AVLVerifier(startDigest: Digest) {
         return curHash.data contentEquals curDigest.data
     }
 
-    fun verifyInsertion(key: Int, value: LeafData, nextKey: Int?, proof: Proof, newDigest: Digest): Boolean {
+    fun verifyChange(key: Int, value: LeafData, nextKey: Int?, proof: Proof, newDigest: Digest): Boolean {
         var curHash = hashLeafNode(key, value, nextKey)
         val size = proof.heights.size
 
@@ -79,7 +79,9 @@ class AVLVerifier(startDigest: Digest) {
                         val Q = proofElems[curIndex - 1]
                         // R = curHash, не меняется
 
-                        require(directions[curIndex - 2] == Direction.RIGHT)
+                        if (directions[curIndex - 2] != Direction.RIGHT) {
+                            return false
+                        }
 
                         proofElems[curIndex - 2] = hashTreeNode(P, Q)
                     } else {
@@ -90,7 +92,9 @@ class AVLVerifier(startDigest: Digest) {
                         val Q = curHash
                         val R = proofElems[curIndex - 1]
 
-                        require(directions[curIndex - 2] == Direction.RIGHT)
+                        if (directions[curIndex - 2] != Direction.RIGHT) {
+                            return false
+                        }
 
                         proofElems[curIndex - 2] = R
                         directions[curIndex - 2] = Direction.LEFT
@@ -115,7 +119,9 @@ class AVLVerifier(startDigest: Digest) {
                         /*
                         Идём по пути P -> b -> a
                          */
-                        require(directions[curIndex - 2] == Direction.LEFT)
+                        if (directions[curIndex - 2] != Direction.LEFT) {
+                            return false
+                        }
                         // P = curHash, не меняется
                         val Q = proofElems[curIndex - 1]
                         val R = proofElems[curIndex - 2]
@@ -125,7 +131,9 @@ class AVLVerifier(startDigest: Digest) {
                         /*
                         Идём по пути Q -> b -> a
                          */
-                        require(directions[curIndex - 2] == Direction.LEFT)
+                        if (directions[curIndex - 2] != Direction.LEFT) {
+                            return false
+                        }
                         directions[curIndex - 2] = Direction.RIGHT
 
                         val P = proofElems[curIndex - 1]
@@ -178,8 +186,12 @@ class AVLVerifier(startDigest: Digest) {
                         /*
                         Идём по пути Q -> c -> b -> a
                          */
-                        require(directions[curIndex - 2] == Direction.LEFT)
-                        require(directions[curIndex - 3] == Direction.RIGHT)
+                        if (directions[curIndex - 2] != Direction.LEFT) {
+                            return false
+                        }
+                        if (directions[curIndex - 3] != Direction.RIGHT) {
+                            return false
+                        }
 
                         val P = proofElems[curIndex - 3]
                         // Q = curHash, не меняется
@@ -210,8 +222,12 @@ class AVLVerifier(startDigest: Digest) {
                         /*
                         Идём по пути R -> c -> b -> a
                          */
-                        require(directions[curIndex - 2] == Direction.LEFT)
-                        require(directions[curIndex - 3] == Direction.RIGHT)
+                        if (directions[curIndex - 2] != Direction.LEFT) {
+                            return false
+                        }
+                        if (directions[curIndex - 3] != Direction.RIGHT) {
+                            return false
+                        }
 
                         val P = proofElems[curIndex - 3]
                         val Q = proofElems[curIndex - 1]
@@ -236,7 +252,79 @@ class AVLVerifier(startDigest: Digest) {
                 } else if (aBalance == 2 && bBalance == 1 &&
                         (cBalance == -1 || cBalance == 0 || cBalance == 1)) {
                     bigRotationPerformed = true
-                    // TODO: правый большой поворот
+                    /*
+                    Большой правый поворот
+                     */
+                    if (directions[curIndex - 1] == Direction.LEFT) {
+                        /*
+                        Идём по пути Q -> c -> b -> a
+                         */
+                        if (directions[curIndex - 2] != Direction.RIGHT) {
+                            return false
+                        }
+                        if (directions[curIndex - 3] != Direction.LEFT) {
+                            return false
+                        }
+
+                        val P = proofElems[curIndex - 2]
+                        // Q = curHash, не меняется
+                        val R = proofElems[curIndex - 1]
+                        val S = proofElems[curIndex - 3]
+
+                        proofElems[curIndex - 2] = P
+                        proofElems[curIndex - 3] = hashTreeNode(R, S)
+
+                        /*
+                        Пересчитаем высоту
+                         */
+
+                        val pHeight = bLeftHeight
+                        val qHeight = cLeftHeight
+                        val rHeight = cRightHeight
+                        val sHeight = aRightHeight
+                        val newAHeight = maxOf(pHeight, qHeight) + 1
+                        val newBHeight = maxOf(rHeight, sHeight) + 1
+                        // (i - 2)-ая вершина это a'
+                        heights[curIndex - 2] = NodeHeightInfo(pHeight, qHeight)
+                        // (i - 3)-я вершина это c'
+                        heights[curIndex - 3] = NodeHeightInfo(newAHeight, newBHeight)
+                    } else {
+                        /*
+                        Идём по пути R -> c -> b -> a
+                         */
+                        if (directions[curIndex - 2] != Direction.RIGHT) {
+                            return false
+                        }
+                        if (directions[curIndex - 1] != Direction.LEFT) {
+                            return false
+                        }
+
+                        directions[curIndex - 2] = Direction.LEFT
+                        directions[curIndex - 3] = Direction.RIGHT
+
+                        val P = proofElems[curIndex - 2]
+                        val Q = proofElems[curIndex - 1]
+                        // R = curHash, не меняется
+                        val S = proofElems[curIndex - 3]
+
+                        proofElems[curIndex - 2] = S
+                        proofElems[curIndex - 3] = hashTreeNode(P, Q)
+
+                        /*
+                        Пересчёт высоты
+                         */
+
+                        val pHeight = bLeftHeight
+                        val qHeight = cLeftHeight
+                        val rHeight = cRightHeight
+                        val sHeight = aRightHeight
+                        val newAHeight = maxOf(pHeight, qHeight) + 1
+                        val newBHeight = maxOf(rHeight, sHeight) + 1
+                        // (i - 2)-ая вершина это b'
+                        heights[curIndex - 2] = NodeHeightInfo(rHeight, sHeight)
+                        // (i - 3)-я чершина это c'
+                        heights[curIndex - 3] = NodeHeightInfo(newAHeight, newBHeight)
+                    }
                 }
             }
             if (!smallRotationPerformed && !bigRotationPerformed) {
