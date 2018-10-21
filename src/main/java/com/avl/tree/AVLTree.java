@@ -185,7 +185,7 @@ public class AVLTree {
 
     private Node merge(Node nodeA, Node nodeB, Node prev, boolean noSwap) {
         TreeNode result;
-        if (!noSwap) {
+        if (noSwap) {
             result = new TreeNode(nodeA, nodeB, prev, null, null, EMPTY_HASH, 0, 0);
         } else {
             result = new TreeNode(nodeB, nodeA, prev, null, null, EMPTY_HASH, 0, 0);
