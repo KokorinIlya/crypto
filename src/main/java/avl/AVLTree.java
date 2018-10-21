@@ -27,7 +27,8 @@ public class AVLTree {
         return root.getHash();
     }
 
-    public Proof add(LeafNode newNode) throws Exception {
+    public Proof add(int key, byte[] data) throws Exception {
+        LeafNode newNode = new LeafNode(key, null, null, new LeafData(data), null);
         addHelper(root, null, newNode);
         Proof proof = getProof(newNode.getKey());
         root = (TreeNode) balance(root, newNode.getKey());
@@ -37,7 +38,6 @@ public class AVLTree {
     public TreeResponse<Proof, LeafData, LeafNode> find(int key) throws Exception {
         findResult = null;
         findNextNode = null;
-        // Нужно еще не забыть, что ключа в дереве то мозжет и не быть!!!
         Proof proof = getProof(key);
         return new TreeResponse<Proof, LeafData, LeafNode>(proof, findResult, findNextNode);
     }
