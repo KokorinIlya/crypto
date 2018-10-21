@@ -27,12 +27,12 @@ public class AVLTree {
         return root.getHash();
     }
 
-    public Proof add(int key, byte[] data) throws Exception {
+    public TreeResponse<Proof, LeafData, LeafNode> add(int key, byte[] data) throws Exception {
         LeafNode newNode = new LeafNode(key, null, null, new LeafData(data), null);
         addHelper(root, null, newNode);
-        Proof proof = getProof(newNode.getKey());
+        TreeResponse<Proof, LeafData, LeafNode> result = find(key);
         root = (TreeNode) balance(root, newNode.getKey());
-        return proof;
+        return result;
     }
 
     public TreeResponse<Proof, LeafData, LeafNode> find(int key) throws Exception {
