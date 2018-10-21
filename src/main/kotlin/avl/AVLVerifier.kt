@@ -82,7 +82,7 @@ class AVLVerifier(startDigest: Digest) {
 
                 println("aleft $aLeftHeight aright $aRightHeight abalance $aBalance bleft $bLeftHeight bright $bRightHeight bbalance $bBalance")
 
-                if (aBalance == -2 && (bBalance == -1 || bBalance == 0)) {
+                if (aBalance == -2 && (bBalance == -1 || bBalance == 0) && (curIndex != size)) {
                     /*
                     Малый левый поворот
                      */
@@ -141,7 +141,7 @@ class AVLVerifier(startDigest: Digest) {
                         // высота a'
                         heights[curIndex - 1] = NodeHeightInfo(pHeight, qHeight)
                     }
-                } else if (aBalance == 2 && (bBalance == -1 || bBalance == 0)) {
+                } else if (aBalance == 2 && (bBalance == -1 || bBalance == 0) && (curIndex != size)) {
                     /*
                     Малый правый поворот
                      */
@@ -222,7 +222,7 @@ class AVLVerifier(startDigest: Digest) {
                 val bBalance = bLeftHeight - bRightHeight
                 val cBalance = cLeftHeight - cRightHeight
 
-                if (aBalance == -2 && bBalance == 1 && (cBalance == -1 || cBalance == 0 || cBalance == 1)) {
+                if (aBalance == -2 && bBalance == 1 && (cBalance == -1 || cBalance == 0 || cBalance == 1) && (curIndex != size)) {
                     /*
                     Большой левый поворот
                      */
@@ -296,7 +296,7 @@ class AVLVerifier(startDigest: Digest) {
                     }
 
                 } else if (aBalance == 2 && bBalance == 1 &&
-                        (cBalance == -1 || cBalance == 0 || cBalance == 1)) {
+                        (cBalance == -1 || cBalance == 0 || cBalance == 1) && (curIndex != size)) {
                     println("BIG RIGHT ROTATION")
                     bigRotationPerformed = true
                     /*

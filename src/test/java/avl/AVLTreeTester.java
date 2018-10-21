@@ -2,6 +2,8 @@ package avl;
 
 import org.junit.Test;
 
+import java.util.Random;
+
 import static org.junit.Assert.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -89,19 +91,23 @@ public class AVLTreeTester {
         System.out.println(avlTree);
         Digest digest2 = new Digest(avlTree.getRootHash().getData());
         assertTrue(verifier.verifyChange(15, p2.getSecond(), p2.getThird(), p2.getFirst(), digest2));
-//
-//        TreeResponse<Proof, LeafData, LeafNode> p3 = avlTree.add(300, b);
-//        Digest digest3 = new Digest(avlTree.getRootHash().getData());
-//        assertTrue(verifier.verifyChange(300, p3.getSecond(), p3.getThird(), p3.getFirst(), digest3));
-//
-//        System.out.println(avlTree);
-//        TreeResponse<Proof, LeafData, LeafNode> p4 = avlTree.add(299, b);
-//        Digest digest4 = new Digest(avlTree.getRootHash().getData());
-//        assertTrue(verifier.verifyChange(299, p4.getSecond(), p4.getThird(), p4.getFirst(), digest4));
 
-//        TreeResponse<Proof, LeafData, LeafNode> p5 = avlTree.add(301, b);
-//        Digest digest5 = new Digest(avlTree.getRootHash().getData());
-//        assertTrue(verifier.verifyChange(301, p5.getSecond(), p5.getThird(), p5.getFirst(), digest5));
+        TreeResponse<Proof, LeafData, LeafNode> p3 = avlTree.add(300, b);
+        Digest digest3 = new Digest(avlTree.getRootHash().getData());
+        assertTrue(verifier.verifyChange(300, p3.getSecond(), p3.getThird(), p3.getFirst(), digest3));
+
+        System.out.println(avlTree);
+        TreeResponse<Proof, LeafData, LeafNode> p4 = avlTree.add(299, b);
+        Digest digest4 = new Digest(avlTree.getRootHash().getData());
+        assertTrue(verifier.verifyChange(299, p4.getSecond(), p4.getThird(), p4.getFirst(), digest4));
+
+        TreeResponse<Proof, LeafData, LeafNode> p5 = avlTree.add(301, b);
+        Digest digest5 = new Digest(avlTree.getRootHash().getData());
+        assertTrue(verifier.verifyChange(301, p5.getSecond(), p5.getThird(), p5.getFirst(), digest5));
+
+        TreeResponse<Proof, LeafData, LeafNode> p6 = avlTree.add(600, b);
+        Digest digest6 = new Digest(avlTree.getRootHash().getData());
+        assertTrue(verifier.verifyChange(600, p6.getSecond(), p6.getThird(), p6.getFirst(), digest6));
 
 
     }
