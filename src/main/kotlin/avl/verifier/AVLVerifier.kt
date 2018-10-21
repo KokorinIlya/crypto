@@ -353,5 +353,4 @@ class AVLVerifier(startDigest: Digest) {
         }
         return result
     }
-
 }
