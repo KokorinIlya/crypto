@@ -21,7 +21,6 @@ class AVLVerifier(startDigest: Digest) {
         for (i in (size - 1) downTo 0) {
             val treeNodeHash = proof.entries[i]
             val curDirection = proof.directions[i]
-            println("curHash $curHash curDir $curDirection treehash $treeNodeHash")
             curHash = if (curDirection == Direction.LEFT) {
                 hashTreeNode(curHash, treeNodeHash)
             } else {
@@ -55,9 +54,11 @@ class AVLVerifier(startDigest: Digest) {
          */
 
         for (curIndex in size downTo 1) {
+            println("INDEX IS $curIndex")
             var smallRotationPerformed = false
             var bigRotationPerformed = false
             if (curIndex >= 2) {
+                println("MAYBE SMALL ROTATION")
                 /*
                 b - (i - 1)-ая вершина
                 a - (i - 2)-ая вершина
@@ -73,6 +74,8 @@ class AVLVerifier(startDigest: Digest) {
 
                 val aBalance = aLeftHeight - aRightHeight
                 val bBalance = bLeftHeight - bRightHeight
+
+                println("aleft $aLeftHeight aright $aRightHeight abalance $aBalance bleft $bLeftHeight bright $bRightHeight bbalance $bBalance")
 
                 if (aBalance == -2 && (bBalance == -1 || bBalance == 0)) {
                     /*
@@ -166,7 +169,7 @@ class AVLVerifier(startDigest: Digest) {
                     heights[curIndex - 2] = NodeHeightInfo(pHeight, newAHeight)
                 }
             }
-            if (curIndex >= 3 && !smallRotationPerformed) {
+            if (curIndex >= 3) {
                 /*
                 Малое вращение не производилось, можно провести большое
                  */
