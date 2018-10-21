@@ -2,7 +2,6 @@ package avl
 
 import java.security.MessageDigest
 import java.util.*
-import kotlin.collections.ArrayList
 
 data class NodeHeightInfo(val leftHeight: Int, val rightHeight: Int)
 
@@ -54,6 +53,10 @@ data class Hash(val data: ByteArray) {
 
     override fun hashCode(): Int {
         return Arrays.hashCode(data)
+    }
+
+    override fun toString(): String {
+        return Base64.getEncoder().encodeToString(data)
     }
 }
 
