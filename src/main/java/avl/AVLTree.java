@@ -72,7 +72,7 @@ public class AVLTree {
             }
             ProofEntity proofEntity = new ProofEntity(
                 leaf.getHash(),
-                moveLeft ? Direction.RIGHT : Direction.LEFT
+                !moveLeft ? Direction.RIGHT : Direction.LEFT
             );
             if (justAns) {
                 System.out.println(leaf.getKey() + "!");
@@ -84,7 +84,7 @@ public class AVLTree {
                 System.out.println(tree.getRightMin() + "?");
                 ProofEntity proofEntity = new ProofEntity(
                     tree.getHash(),
-                    moveLeft ? Direction.RIGHT : Direction.LEFT
+                    !moveLeft ? Direction.RIGHT : Direction.LEFT
                 );
                 result.add(proofEntity);
                 return result;
@@ -206,7 +206,7 @@ public class AVLTree {
                 nodeA.getNextKey().setPrevKey(nodeB);
             }
             nodeB.setNextKey(nodeA.getNextKey());
-            //nodeA.setNextKey(nodeB);
+            nodeA.setNextKey(nodeB);
             result = new TreeNode(nodeA, nodeB, prev, null, null, EMPTY_HASH, 0, 0);
         } else {
             if (nodeA.getPrevKey() != null) {
@@ -214,7 +214,7 @@ public class AVLTree {
             }
             nodeB.setPrevKey(nodeA.getPrevKey());
             nodeA.setPrevKey(nodeB);
-            //nodeB.setNextKey(nodeA);
+            nodeB.setNextKey(nodeA);
             result = new TreeNode(nodeB, nodeA, prev, null, null, EMPTY_HASH, 0, 0);
         }
         result.calculateAll();
