@@ -112,6 +112,24 @@ data class TreeNode(var left: Node?, var right: Node?, override var prev: Node?,
         calculateHash()
         calculateHeights()
         calculateMins()
+        updatePrevs()
+    }
+
+    private fun updatePrevs() {
+        if (left != null) {
+            if (left is TreeNode) {
+                (left as TreeNode).prev = this
+            } else if (left is LeafNode) {
+                (left as LeafNode).prev = this
+            }
+        }
+        if (right != null) {
+            if (right is TreeNode) {
+                (right as TreeNode).prev = this
+            } else if (right is LeafNode) {
+                (right as LeafNode).prev = this
+            }
+        }
     }
 
     private fun calculateHash() {
@@ -154,7 +172,7 @@ data class TreeNode(var left: Node?, var right: Node?, override var prev: Node?,
         return when (node) {
             null -> 0
             is LeafNode -> 1
-            is TreeNode -> maxOf(node.leftHeight, node.rightHeight)
+            is TreeNode -> maxOf(node.leftHeight + 1, node.rightHeight + 1)
         }
 
     }

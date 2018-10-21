@@ -2,6 +2,7 @@ package com.avl.tree;
 
 import avl.Direction;
 import avl.Hash;
+import avl.LeafData;
 import avl.LeafNode;
 import avl.Node;
 import avl.NodeHeightInfo;
@@ -19,13 +20,17 @@ public class AVLTree {
     private TreeNode root = null;
 
     public AVLTree() {
-        root = new TreeNode(null, null, null, null, null, EMPTY_HASH, 0, 0);
+        root = new TreeNode(
+            new LeafNode(Integer.MIN_VALUE, null, new LeafData(new byte[0]), null),
+            new LeafNode(Integer.MAX_VALUE, null, new LeafData(new byte[0]), null),
+            null, null, null, EMPTY_HASH, 0, 0);
+        root.calculateAll();
     }
 
     public Proof add(LeafNode newNode) throws Exception {
         addHelper(root, null, newNode);
         Proof proof = getProof(newNode.getKey());
-        root = (TreeNode) balance(root, newNode.getKey());
+        //root = (TreeNode) balance(root, newNode.getKey());
         return proof;
     }
 
@@ -227,5 +232,47 @@ public class AVLTree {
             }
             node.calculateAll();
         }
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder();
+        toStringHelper(root, stringBuilder, 0);
+        return stringBuilder.toString();
+    }
+
+    private void toStringHelper(Node node, StringBuilder stringBuilder, int h) {
+        if (node == null) {
+            stringBuilder.append("GO BACK\n");
+            return;
+        }
+        if (node instanceof LeafNode) {
+            LeafNode leaf = (LeafNode) node;
+            stringBuilder.append("Leaf{key: ")
+                .append(leaf.getKey())
+                .append(", hash: ")
+                .append(leaf.getHash())
+                .append(", height: ")
+                .append(h)
+                .append("}\n");
+        } else if (node instanceof TreeNode) {
+            TreeNode tree = (TreeNode) node;
+            stringBuilder.append("TreeNode{rightMin: ")
+                .append(tree.getRightMin())
+                .append(", allMin: ")
+                .append(tree.getAllMin())
+                .append(", leftHeight: ")
+                .append(tree.getLeftHeight())
+                .append(", rightHeight: ")
+                .append(tree.getRightHeight())
+                .append(", hash: ")
+                .append(tree.getHash())
+                .append("}\n");
+            stringBuilder.append("GO LEFT\n");
+            toStringHelper(tree.getLeft(), stringBuilder, h + 1);
+            stringBuilder.append("GO RIGHT\n");
+            toStringHelper(tree.getRight(), stringBuilder, h + 1);
+        }
+        stringBuilder.append("GO BACK\n");
     }
 }
