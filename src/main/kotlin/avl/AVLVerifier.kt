@@ -1,6 +1,4 @@
-package avl.verifier
-
-import avl.*
+package avl
 
 class AVLVerifier(startDigest: Digest) {
 

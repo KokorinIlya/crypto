@@ -1,14 +1,4 @@
-package com.avl.tree;
-
-import avl.Direction;
-import avl.Hash;
-import avl.LeafData;
-import avl.LeafNode;
-import avl.Node;
-import avl.NodeHeightInfo;
-import avl.Proof;
-import avl.ProofEntity;
-import avl.TreeNode;
+package avl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,12 +34,12 @@ public class AVLTree {
         return proof;
     }
 
-    public Pair<Proof, LeafData, LeafNode> find(int key) throws Exception {
+    public TreeResponse<Proof, LeafData, LeafNode> find(int key) throws Exception {
         findResult = null;
         findNextNode = null;
         // Нужно еще не забыть, что ключа в дереве то мозжет и не быть!!!
         Proof proof = getProof(key);
-        return new Pair<Proof, LeafData, LeafNode>(proof, findResult, findNextNode);
+        return new TreeResponse<Proof, LeafData, LeafNode>(proof, findResult, findNextNode);
     }
 
     private Proof getProof(int key) throws Exception {
