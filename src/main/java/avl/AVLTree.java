@@ -164,7 +164,7 @@ public class AVLTree {
                 return balanceNode(result);
             }
         } else if (diff == 2) {
-            if (getDiff(tree.getLeft()) >= 0) {
+            if (getDiff(tree.getLeft()) < 0) {
                 System.out.println("Right SMALL rotation!");
                 TreeNode b = (TreeNode) tree.getLeft();
                 tree.setLeft(b.getRight());
