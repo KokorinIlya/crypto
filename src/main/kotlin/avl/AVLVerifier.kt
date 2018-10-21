@@ -82,7 +82,7 @@ class AVLVerifier(startDigest: Digest) {
 
                 println("aleft $aLeftHeight aright $aRightHeight abalance $aBalance bleft $bLeftHeight bright $bRightHeight bbalance $bBalance")
 
-                if (aBalance == -2 && (bBalance == -1 || bBalance == 0) && (curIndex != size)) {
+                if (aBalance == -2 && (bBalance == -1 || bBalance == 0)) {
                     /*
                     Малый левый поворот
                      */
@@ -141,7 +141,7 @@ class AVLVerifier(startDigest: Digest) {
                         // высота a'
                         heights[curIndex - 1] = NodeHeightInfo(pHeight, qHeight)
                     }
-                } else if (aBalance == 2 && (bBalance == -1 || bBalance == 0) && (curIndex != size)) {
+                } else if (aBalance == 2 && (bBalance == -1 || bBalance == 0)) {
                     /*
                     Малый правый поворот
                      */
