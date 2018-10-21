@@ -32,13 +32,7 @@ class AVLVerifier(startDigest: Digest) {
         println(heights)
         println(directions)
         println(proofElems)
-
-        /*
-        Массивы отражают путь от 0 (листа) к корню (size), а надо наоборот
-         */
-        heights.reverse()
-        directions.reverse()
-        proofElems.reverse()
+        
         /*
         Всего на пути size + 1 вершин с номерами с 0 по size включительно
         Вершина с i-ым номером - это вершина с расстоянием до корня, равным i.

@@ -59,6 +59,7 @@ public class AVLTreeTester {
         AVLVerifier verifier = new AVLVerifier(new Digest(avlTree.getRootHash().getData()));
         byte[] b = new byte[]{2, 4, 6, 0, 1};
         TreeResponse<Proof, LeafData, LeafNode> pair = avlTree.add(10, b);
+        System.out.println(avlTree);
         Digest digest = new Digest(avlTree.getRootHash().getData());
         assertTrue(verifier.verifyChange(10, pair.getSecond(), pair.getThird(), pair.getFirst(), digest));
     }
