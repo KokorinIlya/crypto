@@ -112,10 +112,10 @@ public class AVLTree {
             throw new Exception("YOU LOSE!");
         }
         if (key >= tree.getRightMin()) {
-            balance(tree.getRight(), key);
+            tree.setRight(balance(tree.getRight(), key));
             return balanceNode(node);
         } else {
-            balance(tree.getLeft(), key);
+            tree.setLeft(balance(tree.getLeft(), key));
             return balanceNode(node);
         }
     }
@@ -129,6 +129,7 @@ public class AVLTree {
         int diff = getDiff(tree);
         if (diff == -2) {
             if (getDiff(tree.getRight()) <= 0) {
+                System.out.println("Left SMALL rotation!");
                 TreeNode a = tree;
                 TreeNode b = (TreeNode) tree.getRight();
                 a.setRight(b.getLeft());
@@ -137,6 +138,7 @@ public class AVLTree {
                 result.setLeft(balanceNode(result.getLeft()));
                 return balanceNode(result);
             } else {
+                System.out.println("Left BIG rotation!");
                 TreeNode a = tree;
                 TreeNode b = (TreeNode) tree.getRight();
                 TreeNode c = (TreeNode) b.getLeft();
@@ -151,6 +153,7 @@ public class AVLTree {
             }
         } else if (diff == 2) {
             if (getDiff(tree.getLeft()) >= 0) {
+                System.out.println("Right SMALL rotation!");
                 TreeNode a = tree;
                 TreeNode b = (TreeNode) tree.getLeft();
                 a.setLeft(b.getRight());
@@ -159,6 +162,7 @@ public class AVLTree {
                 result.setRight(balanceNode(result.getRight()));
                 return balanceNode(result);
             } else {
+                System.out.println("Right BIG rotation!");
                 TreeNode a = tree;
                 TreeNode b = (TreeNode) tree.getLeft();
                 TreeNode c = (TreeNode) b.getRight();

@@ -9,6 +9,8 @@ public class Main {
         byte[] b = new byte[]{1};
         avlTree.add(new LeafNode(10, null, new LeafData(b), null));
         avlTree.add(new LeafNode(15, null, new LeafData(b), null));
+        avlTree.add(new LeafNode(20, null, new LeafData(b), null));
+        avlTree.add(new LeafNode(22, null, new LeafData(b), null));
         System.out.println(avlTree);
     }
 }

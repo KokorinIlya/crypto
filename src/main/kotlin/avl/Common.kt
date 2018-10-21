@@ -163,7 +163,7 @@ data class TreeNode(var left: Node?, var right: Node?, override var prev: Node?,
         return when (node) {
             null -> null
             is LeafNode -> node.key
-            is TreeNode -> node.rightMin
+            is TreeNode -> node.allMin
         }
 
     }
