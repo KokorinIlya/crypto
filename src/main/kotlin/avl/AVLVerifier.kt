@@ -8,8 +8,17 @@ class AVLVerifier(startDigest: Digest) {
 
     fun verifySearch(key: Int, value: LeafData, nextKey: LeafNode?, proof: Proof): Boolean {
         var curHash = hashLeafNode(key, value, nextKey)
+
+        val heights = proof.heights
+        val directions = proof.directions
+        val proofElems = proof.entries
+
+        println(heights)
+        println(directions)
+        println(proofElems)
+
         val size = proof.entries.size
-        for (i in 0 until size) {
+        for (i in (size - 1) downTo 0) {
             val treeNodeHash = proof.entries[i]
             val curDirection = proof.directions[i]
             curHash = if (curDirection == Direction.LEFT) {
@@ -32,7 +41,7 @@ class AVLVerifier(startDigest: Digest) {
         println(heights)
         println(directions)
         println(proofElems)
-        
+
         /*
         Всего на пути size + 1 вершин с номерами с 0 по size включительно
         Вершина с i-ым номером - это вершина с расстоянием до корня, равным i.

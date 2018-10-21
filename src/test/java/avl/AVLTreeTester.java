@@ -12,6 +12,7 @@ public class AVLTreeTester {
         AVLTree avlTree = new AVLTree();
         byte[] b = new byte[]{2, 4, 6, 0, 1};
         avlTree.add(10, b);
+        System.out.println(avlTree);
         TreeResponse<Proof, LeafData, LeafNode> pair = avlTree.find(10);
         AVLVerifier verifier = new AVLVerifier(new Digest(avlTree.getRootHash().getData()));
         assertTrue(verifier.verifySearch(10, pair.getSecond(), pair.getThird(), pair.getFirst()));
