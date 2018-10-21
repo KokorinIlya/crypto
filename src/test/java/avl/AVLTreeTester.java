@@ -36,6 +36,8 @@ public class AVLTreeTester {
         avlTree.add(20, b);
         avlTree.add(22, b);
         TreeResponse<Proof, LeafData, LeafNode> pair = avlTree.find(15);
+        System.out.println("!!!!\n");
+        System.out.println(avlTree);
         AVLVerifier verifier = new AVLVerifier(new Digest(avlTree.getRootHash().getData()));
         assertTrue(verifier.verifySearch(15, pair.getSecond(), pair.getThird(), pair.getFirst()));
     }

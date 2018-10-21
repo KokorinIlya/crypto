@@ -207,14 +207,19 @@ public class AVLTree {
             }
             nodeB.setNextKey(nodeA.getNextKey());
             nodeA.setNextKey(nodeB);
+            nodeA.recalcHash();
+            nodeB.recalcHash();
             result = new TreeNode(nodeA, nodeB, prev, null, null, EMPTY_HASH, 0, 0);
         } else {
             if (nodeA.getPrevKey() != null) {
                 nodeA.getPrevKey().setNextKey(nodeB);
+                nodeA.getPrevKey().recalcHash();
             }
             nodeB.setPrevKey(nodeA.getPrevKey());
             nodeA.setPrevKey(nodeB);
             nodeB.setNextKey(nodeA);
+            nodeB.recalcHash();
+            nodeA.recalcHash();
             result = new TreeNode(nodeB, nodeA, prev, null, null, EMPTY_HASH, 0, 0);
         }
         result.calculateAll();
