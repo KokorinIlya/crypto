@@ -37,7 +37,7 @@ data class Proof(val entries: MutableList<Hash>,
     }
 }
 
-data class ProofEntity(val entry: Hash, val height: NodeHeightInfo, val direction: Direction)
+data class ProofEntity(val entry: Hash, val direction: Direction)
 
 data class Hash(val data: ByteArray) {
     override fun equals(other: Any?): Boolean {
@@ -171,8 +171,8 @@ data class TreeNode(var left: Node?, var right: Node?, override var prev: Node?,
     private fun getHeight(node: Node?): Int {
         return when (node) {
             null -> 0
-            is LeafNode -> 1
-            is TreeNode -> maxOf(node.leftHeight + 1, node.rightHeight + 1)
+            is LeafNode -> 0
+            is TreeNode -> maxOf(node.leftHeight, node.rightHeight) + 1
         }
 
     }

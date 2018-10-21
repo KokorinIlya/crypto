@@ -45,14 +45,15 @@ public class AVLTree {
         return new TreeResponse<Proof, LeafData, LeafNode>(proof, findResult, findNextNode);
     }
 
+    private List<NodeHeightInfo> heightInfos;
+
     private Proof getProof(int key) throws Exception {
+        heightInfos = new ArrayList<NodeHeightInfo>();
         List<ProofEntity> almostProof = getProofHelper(root, key, false, false);
         List<Hash> entries = new ArrayList<Hash>();
-        List<NodeHeightInfo> heightInfos = new ArrayList<NodeHeightInfo>();
         List<Direction> directions = new ArrayList<Direction>();
         for (ProofEntity entity : almostProof) {
             entries.add(entity.getEntry());
-            heightInfos.add(entity.getHeight());
             directions.add(entity.getDirection());
         }
         return new Proof(entries, heightInfos, directions);
@@ -71,7 +72,6 @@ public class AVLTree {
             }
             ProofEntity proofEntity = new ProofEntity(
                 leaf.getHash(),
-                new NodeHeightInfo(0, 0),
                 moveLeft ? Direction.RIGHT : Direction.LEFT
             );
             if (justAns) {
@@ -84,11 +84,12 @@ public class AVLTree {
                 System.out.println(tree.getRightMin() + "?");
                 ProofEntity proofEntity = new ProofEntity(
                     tree.getHash(),
-                    new NodeHeightInfo(tree.getLeftHeight(), tree.getRightHeight()),
                     moveLeft ? Direction.RIGHT : Direction.LEFT
                 );
                 result.add(proofEntity);
                 return result;
+            } else {
+                heightInfos.add(new NodeHeightInfo(tree.getLeftHeight(), tree.getRightHeight()));
             }
             Integer rightMin = tree.getRightMin();
             if (rightMin == null) {
@@ -205,6 +206,7 @@ public class AVLTree {
                 nodeA.getNextKey().setPrevKey(nodeB);
             }
             nodeB.setNextKey(nodeA.getNextKey());
+            //nodeA.setNextKey(nodeB);
             result = new TreeNode(nodeA, nodeB, prev, null, null, EMPTY_HASH, 0, 0);
         } else {
             if (nodeA.getPrevKey() != null) {
@@ -212,6 +214,7 @@ public class AVLTree {
             }
             nodeB.setPrevKey(nodeA.getPrevKey());
             nodeA.setPrevKey(nodeB);
+            //nodeB.setNextKey(nodeA);
             result = new TreeNode(nodeB, nodeA, prev, null, null, EMPTY_HASH, 0, 0);
         }
         result.calculateAll();
