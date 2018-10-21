@@ -19,6 +19,7 @@ public class AVLTree {
 
     private TreeNode root = null;
     private LeafData findResult = null;
+    private LeafNode findNextNode = null;
 
     public AVLTree() {
         root = new TreeNode(
@@ -43,11 +44,12 @@ public class AVLTree {
         return proof;
     }
 
-    public Pair<Proof, LeafData> find(int key) throws Exception {
+    public Pair<Proof, LeafData, LeafNode> find(int key) throws Exception {
         findResult = null;
+        findNextNode = null;
         // Нужно еще не забыть, что ключа в дереве то мозжет и не быть!!!
         Proof proof = getProof(key);
-        return new Pair<Proof, LeafData>(proof, findResult);
+        return new Pair<Proof, LeafData, LeafNode>(proof, findResult, findNextNode);
     }
 
     private Proof getProof(int key) throws Exception {
@@ -72,6 +74,7 @@ public class AVLTree {
             LeafNode leaf = (LeafNode) node;
             if (leaf.getKey() == key) {
                 findResult = leaf.getData();
+                findNextNode = leaf.getNextKey();
             }
             ProofEntity proofEntity = new ProofEntity(
                 leaf.getHash(),
