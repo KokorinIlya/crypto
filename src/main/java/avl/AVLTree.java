@@ -75,11 +75,13 @@ public class AVLTree {
                 moveLeft ? Direction.RIGHT : Direction.LEFT
             );
             if (justAns) {
+                System.out.println(leaf.getKey() + "!");
                 result.add(proofEntity);
             }
         } else if (node instanceof TreeNode) {
             TreeNode tree = (TreeNode) node;
             if (justAns) {
+                System.out.println(tree.getRightMin() + "?");
                 ProofEntity proofEntity = new ProofEntity(
                     tree.getHash(),
                     new NodeHeightInfo(tree.getLeftHeight(), tree.getRightHeight()),
@@ -100,8 +102,8 @@ public class AVLTree {
                 rightPart.add(leftPart.get(0));
                 result = rightPart;
             } else {
-                List<ProofEntity> leftPart = getProofHelper(tree.getLeft(), key, false, true);
                 List<ProofEntity> rightPart = getProofHelper(tree.getRight(), key, true, false);
+                List<ProofEntity> leftPart = getProofHelper(tree.getLeft(), key, false, true);
                 if (rightPart.size() != 1) {
                     throw new Exception("Invalid sizes when key < rightMin");
                 }
