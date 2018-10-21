@@ -149,8 +149,7 @@ public class AVLTree {
                 b.setLeft(a);
                 TreeNode result = b;
                 result.setLeft(balanceNode(result.getLeft()));
-                result.calculateAll();
-                return result;
+                return balanceNode(result);
             } else {
                 System.out.println("Left BIG rotation!");
                 TreeNode b = (TreeNode) tree.getRight();
@@ -162,19 +161,17 @@ public class AVLTree {
                 TreeNode result = c;
                 result.setLeft(balanceNode(result.getLeft()));
                 result.setRight(balanceNode(result.getRight()));
-                result.calculateAll();
-                return result;
+                return balanceNode(result);
             }
         } else if (diff == 2) {
-            if (getDiff(tree.getLeft()) < 0) {
+            if (getDiff(tree.getLeft()) <= 0) {
                 System.out.println("Right SMALL rotation!");
                 TreeNode b = (TreeNode) tree.getLeft();
                 tree.setLeft(b.getRight());
                 b.setRight(tree);
                 TreeNode result = b;
                 result.setRight(balanceNode(result.getRight()));
-                result.calculateAll();
-                return result;
+                return balanceNode(result);
             } else {
                 System.out.println("Right BIG rotation!");
                 TreeNode b = (TreeNode) tree.getLeft();
@@ -186,8 +183,7 @@ public class AVLTree {
                 TreeNode result = c;
                 result.setLeft(balanceNode(result.getLeft()));
                 result.setRight(balanceNode(result.getRight()));
-                result.calculateAll();
-                return result;
+                return balanceNode(result);
             }
         }
         return node;
