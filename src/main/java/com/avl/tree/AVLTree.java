@@ -30,7 +30,7 @@ public class AVLTree {
     public Proof add(LeafNode newNode) throws Exception {
         addHelper(root, null, newNode);
         Proof proof = getProof(newNode.getKey());
-        //root = (TreeNode) balance(root, newNode.getKey());
+        root = (TreeNode) balance(root, newNode.getKey());
         return proof;
     }
 
@@ -149,7 +149,7 @@ public class AVLTree {
                 result.setRight(balanceNode(result.getRight()));
                 return balanceNode(result);
             }
-        } else {
+        } else if (diff == 2) {
             if (getDiff(tree.getLeft()) >= 0) {
                 TreeNode a = tree;
                 TreeNode b = (TreeNode) tree.getLeft();
@@ -172,6 +172,7 @@ public class AVLTree {
                 return balanceNode(result);
             }
         }
+        return node;
     }
 
     private int getDiff(Node node) {
