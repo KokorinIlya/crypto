@@ -32,6 +32,10 @@ public class AVLTree {
         root.calculateAll();
     }
 
+    public Hash getRootHash() {
+        return root.getHash();
+    }
+
     public Proof add(LeafNode newNode) throws Exception {
         addHelper(root, null, newNode);
         Proof proof = getProof(newNode.getKey());

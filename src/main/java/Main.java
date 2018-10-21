@@ -1,6 +1,8 @@
 import avl.LeafData;
 import avl.LeafNode;
+import avl.Proof;
 import com.avl.tree.AVLTree;
+import com.avl.tree.Pair;
 
 public class Main {
 
@@ -11,6 +13,8 @@ public class Main {
 //        avlTree.add(new LeafNode(15, null, null, new LeafData(b), null));
 //        avlTree.add(new LeafNode(20, null, null, new LeafData(b), null));
 //        avlTree.add(new LeafNode(22, null, null, new LeafData(b), null));
+        Pair<Proof, LeafData> pair = avlTree.find(10);
         System.out.println(avlTree);
+        System.out.println(pair.getFirst());
     }
 }
