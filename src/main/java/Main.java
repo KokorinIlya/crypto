@@ -8,9 +8,9 @@ public class Main {
         AVLTree avlTree = new AVLTree();
         byte[] b = new byte[]{1};
         avlTree.add(new LeafNode(10, null, null, new LeafData(b), null));
-        avlTree.add(new LeafNode(15, null, null, new LeafData(b), null));
-        avlTree.add(new LeafNode(20, null, null, new LeafData(b), null));
-        avlTree.add(new LeafNode(22, null, null, new LeafData(b), null));
+//        avlTree.add(new LeafNode(15, null, null, new LeafData(b), null));
+//        avlTree.add(new LeafNode(20, null, null, new LeafData(b), null));
+//        avlTree.add(new LeafNode(22, null, null, new LeafData(b), null));
         System.out.println(avlTree);
     }
 }

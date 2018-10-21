@@ -18,6 +18,7 @@ public class AVLTree {
     private static Hash EMPTY_HASH = new Hash(new byte[0]);
 
     private TreeNode root = null;
+    private LeafData findResult = null;
 
     public AVLTree() {
         root = new TreeNode(
@@ -38,9 +39,11 @@ public class AVLTree {
         return proof;
     }
 
-    public Proof find(int key) throws Exception {
+    public Pair<Proof, LeafData> find(int key) throws Exception {
+        findResult = null;
         // Нужно еще не забыть, что ключа в дереве то мозжет и не быть!!!
-        return getProof(key);
+        Proof proof = getProof(key);
+        return new Pair<Proof, LeafData>(proof, findResult);
     }
 
     private Proof getProof(int key) throws Exception {
@@ -63,6 +66,9 @@ public class AVLTree {
         }
         if (node instanceof LeafNode) {
             LeafNode leaf = (LeafNode) node;
+            if (leaf.getKey() == key) {
+                findResult = leaf.getData();
+            }
             ProofEntity proofEntity = new ProofEntity(
                 leaf.getHash(),
                 new NodeHeightInfo(0, 0),
