@@ -6,6 +6,11 @@ class AVLVerifier(startDigest: Digest) {
 
     private var curDigest = startDigest
 
+    private fun getCurHeightInfo(curIndex: Int, heights: MutableList<NodeHeightInfo>): NodeHeightInfo {
+        return if (curIndex == heights.size) NodeHeightInfo(-1, -1) else
+            heights[curIndex]
+    }
+
     fun verifySearch(key: Int, value: LeafData, nextKey: LeafNode?, proof: Proof): Boolean {
         var curHash = hashLeafNode(key, value, nextKey)
 
@@ -96,6 +101,18 @@ class AVLVerifier(startDigest: Digest) {
                         }
 
                         proofElems[curIndex - 2] = hashTreeNode(P, Q)
+
+                        /*
+                        Пересчёт высоты
+                         */
+                        val pHeight = aLeftHeight
+                        val qHeight = bLeftHeight
+                        val rHeight = bRightHeight
+                        val newAHeight = maxOf(pHeight, qHeight) + 1
+                        // высота b'
+                        heights[curIndex - 2] = NodeHeightInfo(newAHeight, rHeight)
+                        // Высота R
+                        heights[curIndex - 1] = getCurHeightInfo(curIndex, heights)
                     } else {
                         /*
                         Идём по направлению Q -> b -> a
@@ -111,17 +128,19 @@ class AVLVerifier(startDigest: Digest) {
                         proofElems[curIndex - 2] = R
                         directions[curIndex - 2] = Direction.LEFT
                         curHash = hashTreeNode(P, Q)
-                    }
 
-                    /*
-                    Пересчёт высоты
-                     */
-                    val pHeight = aLeftHeight
-                    val qHeight = bLeftHeight
-                    val rHeight = bRightHeight
-                    val newAHeight = maxOf(pHeight, qHeight) + 1
-                    // высота b'
-                    heights[curIndex - 2] = NodeHeightInfo(newAHeight, rHeight)
+                        /*
+                        Пересчёт высоты
+                         */
+                        val pHeight = aLeftHeight
+                        val qHeight = bLeftHeight
+                        val rHeight = bRightHeight
+                        val newAHeight = maxOf(pHeight, qHeight) + 1
+                        // высота b'
+                        heights[curIndex - 2] = NodeHeightInfo(newAHeight, rHeight)
+                        // высота a'
+                        heights[curIndex - 1] = NodeHeightInfo(pHeight, qHeight)
+                    }
                 } else if (aBalance == 2 && (bBalance == -1 || bBalance == 0)) {
                     /*
                     Малый правый поворот
@@ -140,6 +159,18 @@ class AVLVerifier(startDigest: Digest) {
                         val R = proofElems[curIndex - 2]
 
                         proofElems[curIndex - 2] = hashTreeNode(Q, R)
+
+                        /*
+                        Пересчёт высоты
+                         */
+                        val pHeight = bLeftHeight
+                        val qHeight = bRightHeight
+                        val rHeight = aRightHeight
+                        val newAHeight = maxOf(qHeight, rHeight) + 1
+                        // высота b'
+                        heights[curIndex - 2] = NodeHeightInfo(pHeight, newAHeight)
+                        // высота P
+                        heights[curIndex - 1] = getCurHeightInfo(curIndex, heights)
                     } else {
                         /*
                         Идём по пути Q -> b -> a
@@ -155,18 +186,19 @@ class AVLVerifier(startDigest: Digest) {
 
                         curHash = hashTreeNode(Q, R)
                         proofElems[curIndex - 2] = P
+
+                        /*
+                        Пересчёт высоты
+                         */
+                        val pHeight = bLeftHeight
+                        val qHeight = bRightHeight
+                        val rHeight = aRightHeight
+                        val newAHeight = maxOf(qHeight, rHeight) + 1
+                        // высота b'
+                        heights[curIndex - 2] = NodeHeightInfo(pHeight, newAHeight)
+                        // высота a'
+                        heights[curIndex - 1] = NodeHeightInfo(qHeight, rHeight)
                     }
-
-                    /*
-                    Пересчёт высоты
-                     */
-
-                    val pHeight = bLeftHeight
-                    val qHeight = bRightHeight
-                    val rHeight = aRightHeight
-                    val newAHeight = maxOf(qHeight, rHeight) + 1
-                    // высота b'
-                    heights[curIndex - 2] = NodeHeightInfo(pHeight, newAHeight)
                 }
             }
             if (curIndex >= 3) {
@@ -221,7 +253,6 @@ class AVLVerifier(startDigest: Digest) {
                         /*
                         Пересчитаем высоту
                         */
-
                         val pHeight = aLeftHeight
                         val qHeight = cLeftHeight
                         val rHeight = cRightHeight
@@ -257,6 +288,7 @@ class AVLVerifier(startDigest: Digest) {
                         val sHeight = bRightHeight
                         val newAHeight = maxOf(pHeight, qHeight) + 1
                         val newBHeight = maxOf(rHeight, sHeight) + 1
+
                         // (i - 2)-ая вершина это b'
                         heights[curIndex - 2] = NodeHeightInfo(rHeight, sHeight)
                         // (i - 3)-я вершина это c'
