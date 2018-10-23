@@ -108,9 +108,11 @@ public class AVLTreeTester {
         Digest digest6 = new Digest(avlTree.getRootHash().getData());
         assertTrue(verifier.verifyChange(600, p6.getSecond(), p6.getThird(), p6.getFirst(), digest6));
 
-        TreeResponse<Proof, LeafData, LeafNode> p7 = avlTree.add(400, b);
-        Digest digest7 = new Digest(avlTree.getRootHash().getData());
-        assertTrue(verifier.verifyChange(400, p7.getSecond(), p7.getThird(), p7.getFirst(), digest7));
+        for (int i = 9900; i <= 10000; ++i) {
+            TreeResponse<Proof, LeafData, LeafNode> p7 = avlTree.add(400 + i, b);
+            Digest digest7 = new Digest(avlTree.getRootHash().getData());
+            assertTrue(verifier.verifyChange(400 + i, p7.getSecond(), p7.getThird(), p7.getFirst(), digest7));
+        }
 
         TreeResponse<Proof, LeafData, LeafNode> pair2 = avlTree.find(600);
         AVLVerifier verifier2 = new AVLVerifier(new Digest(avlTree.getRootHash().getData()));
