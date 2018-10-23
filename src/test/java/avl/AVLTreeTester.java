@@ -123,5 +123,36 @@ public class AVLTreeTester {
         assertTrue(verifier.verifyChange(pair.getThird().getPrevKey().getKey(), pair.getSecond(), pair.getThird(), pair.getFirst(), digest));
     }
 
-    
+    @Test
+    public void multipleAdditionAndRemovalCorrectGetInCorrectVerifyRequest() throws Exception {
+        AVLTree avlTree = new AVLTree();
+        byte[] b = new byte[]{2, 4, 6, 0, 1};
+        avlTree.add(10, b);
+        avlTree.remove(15);
+        avlTree.add(20, b);
+        avlTree.remove(20);
+        avlTree.add(15, b);
+        TreeResponse<Proof, LeafData, LeafNode> pair = avlTree.find(15);
+        AVLVerifier verifier = new AVLVerifier(new Digest(avlTree.getRootHash().getData()));
+        Digest digest = new Digest(avlTree.getRootHash().getData());
+        assertTrue(verifier.verifyChange(15, pair.getSecond(), pair.getThird(), pair.getFirst(), digest));
+    }
+
+    @Test
+    public void multipleAdditionAndOneRemovalCorrectGetInCorrectVerifyRequest() throws Exception {
+        AVLTree avlTree = new AVLTree();
+        byte[] b = new byte[]{2, 4, 6, 0, 1};
+        avlTree.add(10, b);
+        avlTree.add(20, b);
+        avlTree.add(15, b);
+        avlTree.add(40, b);
+        avlTree.add(30, b);
+        avlTree.add(55, b);
+        avlTree.add(13, b);
+        avlTree.remove(30);
+        TreeResponse<Proof, LeafData, LeafNode> pair = avlTree.find(40);
+        AVLVerifier verifier = new AVLVerifier(new Digest(avlTree.getRootHash().getData()));
+        Digest digest = new Digest(avlTree.getRootHash().getData());
+        assertTrue(verifier.verifyChange(40, pair.getSecond(), pair.getThird(), pair.getFirst(), digest));
+    }
 }
