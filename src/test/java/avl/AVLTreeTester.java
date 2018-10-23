@@ -5,6 +5,7 @@ import org.junit.Test;
 import java.util.Random;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AVLTreeTester {
@@ -30,7 +31,7 @@ public class AVLTreeTester {
     }
 
     @Test
-    public void multipleAdditionCorrectGetCorrectVerifyReqest() throws Exception {
+    public void multipleAdditionCorrectGetCorrectVerifyRequest() throws Exception {
         AVLTree avlTree = new AVLTree();
         byte[] b = new byte[]{2, 4, 6, 0, 1};
         avlTree.add(10, b);
@@ -45,7 +46,7 @@ public class AVLTreeTester {
     }
 
     @Test
-    public void multipleAdditionCorrectGetInCorrectVerifyReqest() throws Exception {
+    public void multipleAdditionCorrectGetInCorrectVerifyRequest() throws Exception {
         AVLTree avlTree = new AVLTree();
         byte[] b = new byte[]{2, 4, 6, 0, 1};
         avlTree.add(10, b);
@@ -108,7 +109,19 @@ public class AVLTreeTester {
         TreeResponse<Proof, LeafData, LeafNode> p6 = avlTree.add(600, b);
         Digest digest6 = new Digest(avlTree.getRootHash().getData());
         assertTrue(verifier.verifyChange(600, p6.getSecond(), p6.getThird(), p6.getFirst(), digest6));
-
-
     }
+
+    @Test
+    public void simpleRemoveVerification() throws Exception {
+        AVLTree avlTree = new AVLTree();
+        byte[] b = new byte[]{2, 4, 6, 0, 1};
+        avlTree.add(10, b);
+        TreeResponse<Proof, LeafData, LeafNode> pair = avlTree.remove(10);
+        AVLVerifier verifier = new AVLVerifier(new Digest(avlTree.getRootHash().getData()));
+        Digest digest = new Digest(avlTree.getRootHash().getData());
+        assertNotNull(pair.getThird());
+        assertTrue(verifier.verifyChange(pair.getThird().getPrevKey().getKey(), pair.getSecond(), pair.getThird(), pair.getFirst(), digest));
+    }
+
+    
 }

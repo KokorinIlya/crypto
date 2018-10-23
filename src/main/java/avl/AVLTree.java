@@ -1,5 +1,7 @@
 package avl;
 
+import sun.java2d.xr.MutableInteger;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,6 +37,14 @@ public class AVLTree {
             System.out.println("BEFORE: " + this);
         }
         root = (TreeNode) balance(root, newNode.getKey());
+        return result;
+    }
+
+    public TreeResponse<Proof, LeafData, LeafNode> remove(int key) throws Exception {
+        LeafNode leaf = removeHelper(root, key, new MutableInteger(1));
+        TreeResponse<Proof, LeafData, LeafNode> result = find(leaf.getKey());
+        //System.out.println(result.getThird().getKey());
+        //root = (TreeNode) balance(root, key);
         return result;
     }
 
@@ -279,6 +289,52 @@ public class AVLTree {
                 }
             }
             node.calculateAll();
+        }
+    }
+
+    private LeafNode removeHelper(TreeNode currentNode, int key, MutableInteger integer) {
+        Node rightNode = currentNode.getRight();
+        Node leftNode = currentNode.getLeft();
+        if ((rightNode instanceof LeafNode) && (leftNode instanceof LeafNode)) {
+            integer.setValue(0);
+            LeafNode answer;
+            if (((LeafNode) rightNode).getKey() == key) {
+                answer = (LeafNode) leftNode;
+                LeafNode rightNextKey = ((LeafNode) rightNode).getNextKey();
+                answer.setNextKey(rightNextKey);
+                if (rightNextKey != null) {
+                    rightNextKey.setPrevKey(answer);
+                }
+            } else {
+                answer = (LeafNode) rightNode;
+                LeafNode leftPrevKey = ((LeafNode) leftNode).getPrevKey();
+                answer.setPrevKey(leftPrevKey);
+                if (leftPrevKey != null) {
+                    leftPrevKey.setNextKey(answer);
+                }
+            }
+            answer.recalcHash();
+//            System.out.println(answer.getNextKey().getKey());
+            return answer;
+        } else {
+            int rightMin = currentNode.getRightMin();
+            TreeNode next = null;
+            if (rightMin > key) {
+                next = (TreeNode) currentNode.getLeft();
+            } else {
+                next = (TreeNode) currentNode.getRight();
+            }
+            LeafNode node = removeHelper(next, key, integer);
+            if (integer.getValue() == 0) {
+                if (rightMin > key) {
+                    currentNode.setLeft(node);
+                } else {
+                    currentNode.setRight(node);
+                }
+                integer.setValue(1);
+            }
+            currentNode.calculateAll();
+            return node;
         }
     }
 
