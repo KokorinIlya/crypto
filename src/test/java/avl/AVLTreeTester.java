@@ -44,7 +44,7 @@ public class AVLTreeTester {
     }
 
     @Test
-    public void multipleAdditionCorrectGetInCorrectVerifyRequest() throws Exception {
+    public void multipleAscendingAdditionCorrectGetInCorrectVerifyRequest() throws Exception {
         AVLTree avlTree = new AVLTree();
         byte[] b = new byte[]{2, 4, 6, 0, 1};
         avlTree.add(10, b);
@@ -162,5 +162,20 @@ public class AVLTreeTester {
         AVLVerifier verifier = new AVLVerifier(new Digest(avlTree.getRootHash().getData()));
         Digest digest = new Digest(avlTree.getRootHash().getData());
         assertTrue(verifier.verifyChange(40, pair.getSecond(), pair.getThird(), pair.getFirst(), digest));
+    }
+
+    @Test
+    public void sameAdditionsCorrectGetInCorrectVerifyRequest() throws Exception {
+        AVLTree avlTree = new AVLTree();
+        byte[] b = new byte[]{2, 4, 6, 0, 1};
+        avlTree.add(10, b);
+        avlTree.add(10, b);
+        avlTree.add(10, b);
+        avlTree.remove(10);
+        avlTree.add(20, b);
+        TreeResponse<Proof, LeafData, LeafNode> pair = avlTree.find(20);
+        AVLVerifier verifier = new AVLVerifier(new Digest(avlTree.getRootHash().getData()));
+        Digest digest = new Digest(avlTree.getRootHash().getData());
+        assertTrue(verifier.verifyChange(20, pair.getSecond(), pair.getThird(), pair.getFirst(), digest));
     }
 }
