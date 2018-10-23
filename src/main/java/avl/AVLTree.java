@@ -31,9 +31,7 @@ public class AVLTree {
         LeafNode newNode = new LeafNode(key, null, null, new LeafData(data), null);
         addHelper(root, null, newNode);
         TreeResponse<Proof, LeafData, LeafNode> result = find(key);
-        if (key == 15) {
-            System.out.println("BEFORE: " + this);
-        }
+        System.out.println("BEFORE: " + this);
         root = (TreeNode) balance(root, newNode.getKey());
         return result;
     }
@@ -142,11 +140,11 @@ public class AVLTree {
         int diff = getDiff(tree);
         if (diff == -2) {
             if (getDiff(tree.getRight()) <= 0) {
-                System.out.println("Left SMALL rotation! --> from " + tree.getHash() + ":\n" + this);
                 TreeNode a = tree;
                 if (tree.getRight() instanceof LeafNode) {
                     return tree;
                 }
+                System.out.println("Left SMALL rotation! --> from " + tree.getHash() + ":\n" + this);
                 TreeNode b = (TreeNode) tree.getRight();
                 a.setRight(b.getLeft());
                 b.setLeft(a);

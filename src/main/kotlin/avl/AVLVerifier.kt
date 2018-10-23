@@ -201,10 +201,7 @@ class AVLVerifier(startDigest: Digest) {
                     }
                 }
             }
-            if (curIndex >= 3) {
-                /*
-                Малое вращение не производилось, можно провести большое
-                 */
+            if (curIndex >= 3 && !smallRotationPerformed) {
                 val aIndex = curIndex - 3
                 val bIndex = curIndex - 2
                 val cIndex = curIndex - 1
@@ -222,7 +219,7 @@ class AVLVerifier(startDigest: Digest) {
                 val bBalance = bLeftHeight - bRightHeight
                 val cBalance = cLeftHeight - cRightHeight
 
-                if (aBalance == -2 && bBalance == 1 && (cBalance == -1 || cBalance == 0 || cBalance == 1) && (curIndex != size)) {
+                if (aBalance == -2 && bBalance == 1 && (cBalance == -1 || cBalance == 0 || cBalance == 1)) {
                     /*
                     Большой левый поворот
                      */
@@ -296,7 +293,7 @@ class AVLVerifier(startDigest: Digest) {
                     }
 
                 } else if (aBalance == 2 && bBalance == 1 &&
-                        (cBalance == -1 || cBalance == 0 || cBalance == 1) && (curIndex != size)) {
+                        (cBalance == -1 || cBalance == 0 || cBalance == 1)) {
                     println("BIG RIGHT ROTATION")
                     bigRotationPerformed = true
                     /*
