@@ -39,8 +39,6 @@ public class AVLTreeTester {
         avlTree.add(20, b);
         avlTree.add(22, b);
         TreeResponse<Proof, LeafData, LeafNode> pair = avlTree.find(15);
-        System.out.println("!!!!\n");
-        System.out.println(avlTree);
         AVLVerifier verifier = new AVLVerifier(new Digest(avlTree.getRootHash().getData()));
         assertTrue(verifier.verifySearch(15, pair.getSecond(), pair.getThird(), pair.getFirst()));
     }
@@ -109,6 +107,14 @@ public class AVLTreeTester {
         TreeResponse<Proof, LeafData, LeafNode> p6 = avlTree.add(600, b);
         Digest digest6 = new Digest(avlTree.getRootHash().getData());
         assertTrue(verifier.verifyChange(600, p6.getSecond(), p6.getThird(), p6.getFirst(), digest6));
+
+        TreeResponse<Proof, LeafData, LeafNode> p7 = avlTree.add(400, b);
+        Digest digest7 = new Digest(avlTree.getRootHash().getData());
+        assertTrue(verifier.verifyChange(400, p7.getSecond(), p7.getThird(), p7.getFirst(), digest7));
+
+        TreeResponse<Proof, LeafData, LeafNode> pair2 = avlTree.find(600);
+        AVLVerifier verifier2 = new AVLVerifier(new Digest(avlTree.getRootHash().getData()));
+        assertTrue(verifier2.verifySearch(600, pair2.getSecond(), pair2.getThird(), pair2.getFirst()));
     }
 
     @Test

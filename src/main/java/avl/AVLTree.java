@@ -151,7 +151,8 @@ public class AVLTree {
         tree.calculateAll();
         int diff = getDiff(tree);
         if (diff == -2) {
-            if (getDiff(tree.getRight()) <= 0) {
+            int dr = getDiff(tree.getRight());
+            if (dr == 0 || dr == -1) {
                 System.out.println("Left SMALL rotation! --> from " + tree.getHash() + ":\n" + this);
                 TreeNode a = tree;
                 if (tree.getRight() instanceof LeafNode) {
@@ -164,13 +165,17 @@ public class AVLTree {
                 result.setLeft(balanceNode(result.getLeft()));
                 result.calculateAll();
                 return result;
-            } else {
+            } else if (dr == 1) {
                 System.out.println("Left BIG rotation! --> from " + tree.getHash() + ":\n" + this);
                 TreeNode b = (TreeNode) tree.getRight();
                 if (b.getLeft() instanceof LeafNode) {
                     return tree;
                 }
                 TreeNode c = (TreeNode) b.getLeft();
+                int dc = getDiff(c);
+                if (dc != 0 && dc != 1 && dc != -1) {
+                    return tree;
+                }
                 tree.setRight(c.getLeft());
                 b.setLeft(c.getRight());
                 c.setLeft(tree);
@@ -182,7 +187,8 @@ public class AVLTree {
                 return result;
             }
         } else if (diff == 2) {
-            if (getDiff(tree.getLeft()) <= 0) {
+            int dr = getDiff(tree.getLeft());
+            if (dr == 0 || dr == -1) {
                 System.out.println("Right SMALL rotation! --> from " + tree.getHash() + ":\n" + this);
                 if (tree.getLeft() instanceof LeafNode) {
                     return tree;
@@ -201,6 +207,10 @@ public class AVLTree {
                     return tree;
                 }
                 TreeNode c = (TreeNode) b.getRight();
+                int dc = getDiff(c);
+                if (dc != 0 && dc != 1 && dc != -1) {
+                    return tree;
+                }
                 tree.setLeft(c.getRight());
                 b.setRight(c.getLeft());
                 c.setRight(tree);
