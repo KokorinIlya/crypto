@@ -1,7 +1,12 @@
 package avl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 
 public class AVLTree {
 
@@ -13,8 +18,8 @@ public class AVLTree {
 
     public AVLTree() {
         root = new TreeNode(
-            new LeafNode(Integer.MIN_VALUE, null, null, new LeafData(new byte[0]), null),
-            new LeafNode(Integer.MAX_VALUE, null, null, new LeafData(new byte[0]), null),
+            new LeafNode(Integer.MIN_VALUE, Integer.MIN_VALUE, null, null, new LeafData(new byte[0]), null),
+            new LeafNode(Integer.MAX_VALUE, Integer.MAX_VALUE, null, null, new LeafData(new byte[0]), null),
             null, null, null, EMPTY_HASH, 0, 0);
         assert root.getLeft() != null;
         ((LeafNode)root.getLeft()).setNextKey((LeafNode)root.getRight());
@@ -27,13 +32,27 @@ public class AVLTree {
         return root.getHash();
     }
 
+    private boolean hasSmall = false;
+    private boolean hasBig = false;
+    private Set<Integer> have = new HashSet<Integer>();
+    private Map<Integer, Integer> map = new HashMap<Integer, Integer>();
+
     public TreeResponse<Proof, LeafData, LeafNode> add(int key, byte[] data) throws Exception {
-        LeafNode newNode = new LeafNode(key, null, null, new LeafData(data), null);
+        hasSmall = true;
+        hasBig = true;
+        Random random = new Random();
+        int nextKey;
+        while (true) {
+            nextKey = Math.abs(random.nextInt((int)2e9));
+            if (!have.contains(nextKey)) {
+                break;
+            }
+        }
+        have.add(nextKey);
+        map.put(key, nextKey);
+        LeafNode newNode = new LeafNode(key, nextKey, null, null, new LeafData(data), null);
         addHelper(root, null, newNode);
         TreeResponse<Proof, LeafData, LeafNode> result = find(key);
-        if (key == 15) {
-            System.out.println("BEFORE: " + this);
-        }
         root = (TreeNode) balance(root, newNode.getKey());
         return result;
     }
@@ -41,7 +60,7 @@ public class AVLTree {
     public TreeResponse<Proof, LeafData, LeafNode> find(int key) throws Exception {
         findResult = null;
         findNextNode = null;
-        Proof proof = getProof(key);
+        Proof proof = getProof(map.get(key));
         return new TreeResponse<Proof, LeafData, LeafNode>(proof, findResult, findNextNode);
     }
 
@@ -75,13 +94,13 @@ public class AVLTree {
                 moveLeft ? Direction.RIGHT : Direction.LEFT
             );
             if (justAns) {
-                System.out.println(leaf.getKey() + "!");
+                //System.out.println(leaf.getKey() + "!");
                 result.add(proofEntity);
             }
         } else if (node instanceof TreeNode) {
             TreeNode tree = (TreeNode) node;
             if (justAns) {
-                System.out.println(tree.getRightMin() + "?");
+                //System.out.println(tree.getRightMin() + "?");
                 ProofEntity proofEntity = new ProofEntity(
                     tree.getHash(),
                     moveLeft ? Direction.RIGHT : Direction.LEFT
@@ -141,8 +160,9 @@ public class AVLTree {
         tree.calculateAll();
         int diff = getDiff(tree);
         if (diff == -2) {
-            if (getDiff(tree.getRight()) <= 0) {
-                System.out.println("Left SMALL rotation! --> from " + tree.getHash() + ":\n" + this);
+            if ((getDiff(tree.getRight()) == 0 || getDiff(tree.getRight()) == -1) && !hasSmall) {
+                hasSmall = true;
+                //System.out.println("Left SMALL rotation! --> from " + tree.getHash() + ":\n" + this);
                 TreeNode a = tree;
                 if (tree.getRight() instanceof LeafNode) {
                     return tree;
@@ -154,10 +174,15 @@ public class AVLTree {
                 result.setLeft(balanceNode(result.getLeft()));
                 result.calculateAll();
                 return result;
-            } else {
-                System.out.println("Left BIG rotation! --> from " + tree.getHash() + ":\n" + this);
+            } else if (getDiff(tree.getRight()) == -10500 && !hasBig) {
+                hasBig = true;
+                //System.out.println("Left BIG rotation! --> from " + tree.getHash() + ":\n" + this);
                 TreeNode b = (TreeNode) tree.getRight();
                 if (b.getLeft() instanceof LeafNode) {
+                    return tree;
+                }
+                int d = getDiff(b.getLeft());
+                if (d != 0 && d != -1 && d != 1) {
                     return tree;
                 }
                 TreeNode c = (TreeNode) b.getLeft();
@@ -172,8 +197,9 @@ public class AVLTree {
                 return result;
             }
         } else if (diff == 2) {
-            if (getDiff(tree.getLeft()) <= 0) {
-                System.out.println("Right SMALL rotation! --> from " + tree.getHash() + ":\n" + this);
+            if ((getDiff(tree.getLeft()) == 0 || getDiff(tree.getLeft()) == -1) && !hasSmall) {
+                hasSmall = true;
+                //System.out.println("Right SMALL rotation! --> from " + tree.getHash() + ":\n" + this);
                 if (tree.getLeft() instanceof LeafNode) {
                     return tree;
                 }
@@ -184,10 +210,15 @@ public class AVLTree {
                 result.setRight(balanceNode(result.getRight()));
                 result.calculateAll();
                 return result;
-            } else {
-                System.out.println("Right BIG rotation! --> from " + tree.getHash() + ":\n" + this);
+            } else if (getDiff(tree.getLeft()) == -100500 && !hasBig) {
+                hasBig = true;
+                //System.out.println("Right BIG rotation! --> from " + tree.getHash() + ":\n" + this);
                 TreeNode b = (TreeNode) tree.getLeft();
                 if (b.getRight() instanceof LeafNode) {
+                    return tree;
+                }
+                int d = getDiff(b.getRight());
+                if (d != 0 && d != -1 && d != 1) {
                     return tree;
                 }
                 TreeNode c = (TreeNode) b.getRight();

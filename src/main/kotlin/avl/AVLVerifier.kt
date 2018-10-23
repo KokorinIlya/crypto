@@ -18,9 +18,9 @@ class AVLVerifier(startDigest: Digest) {
         val directions = proof.directions
         val proofElems = proof.entries
 
-        println(heights)
-        println(directions)
-        println(proofElems)
+        //println(heights)
+        //println(directions)
+        //println(proofElems)
 
         val size = proof.entries.size
         for (i in (size - 1) downTo 0) {
@@ -43,9 +43,9 @@ class AVLVerifier(startDigest: Digest) {
         val directions = proof.directions
         val proofElems = proof.entries
 
-        println(heights)
-        println(directions)
-        println(proofElems)
+        //println(heights)
+        //println(directions)
+        //println(proofElems)
 
         /*
         Всего на пути size + 1 вершин с номерами с 0 по size включительно
@@ -58,12 +58,14 @@ class AVLVerifier(startDigest: Digest) {
         (то есть  высоты поддеревьев (i + 1)-ой вершины и её брата)
          */
 
+        var hasSmall = true
+        var hasBig = false
         for (curIndex in size downTo 1) {
-            println("INDEX IS $curIndex")
+            //println("INDEX IS $curIndex")
             var smallRotationPerformed = false
             var bigRotationPerformed = false
-            if (curIndex >= 2) {
-                println("MAYBE SMALL ROTATION")
+            /*if (curIndex >= 2 && !hasSmall) {
+                //println("MAYBE SMALL ROTATION")
                 /*
                 b - (i - 1)-ая вершина
                 a - (i - 2)-ая вершина
@@ -80,13 +82,14 @@ class AVLVerifier(startDigest: Digest) {
                 val aBalance = aLeftHeight - aRightHeight
                 val bBalance = bLeftHeight - bRightHeight
 
-                println("aleft $aLeftHeight aright $aRightHeight abalance $aBalance bleft $bLeftHeight bright $bRightHeight bbalance $bBalance")
+                //println("aleft $aLeftHeight aright $aRightHeight abalance $aBalance bleft $bLeftHeight bright $bRightHeight bbalance $bBalance")
 
                 if (aBalance == -2 && (bBalance == -1 || bBalance == 0)) {
                     /*
                     Малый левый поворот
                      */
-                    println("SMALL LEFT ROTATION")
+                    //println("SMALL LEFT ROTATION")
+                    hasSmall = true
                     smallRotationPerformed = true
                     if (directions[curIndex - 1] == Direction.RIGHT) {
                         /*
@@ -145,7 +148,8 @@ class AVLVerifier(startDigest: Digest) {
                     /*
                     Малый правый поворот
                      */
-                    println("SMALL RIGHT ROTATION")
+                    //println("SMALL RIGHT ROTATION")
+                    hasSmall = true
                     smallRotationPerformed = true
                     if (directions[curIndex - 1] == Direction.LEFT) {
                         /*
@@ -200,8 +204,8 @@ class AVLVerifier(startDigest: Digest) {
                         heights[curIndex - 1] = NodeHeightInfo(qHeight, rHeight)
                     }
                 }
-            }
-            if (curIndex >= 3) {
+            }*/
+            /*if (curIndex >= 3) {
                 /*
                 Малое вращение не производилось, можно провести большое
                  */
@@ -226,7 +230,7 @@ class AVLVerifier(startDigest: Digest) {
                     /*
                     Большой левый поворот
                      */
-                    println("BIG LEFT ROTATION")
+                    //println("BIG LEFT ROTATION")
                     bigRotationPerformed = true
                     if (directions[curIndex - 1] == Direction.LEFT) {
                         /*
@@ -297,7 +301,7 @@ class AVLVerifier(startDigest: Digest) {
 
                 } else if (aBalance == 2 && bBalance == 1 &&
                         (cBalance == -1 || cBalance == 0 || cBalance == 1) && (curIndex != size)) {
-                    println("BIG RIGHT ROTATION")
+                    //println("BIG RIGHT ROTATION")
                     bigRotationPerformed = true
                     /*
                     Большой правый поворот
@@ -373,7 +377,7 @@ class AVLVerifier(startDigest: Digest) {
                         heights[curIndex - 3] = NodeHeightInfo(newAHeight, newBHeight)
                     }
                 }
-            }
+            }*/
             if (!smallRotationPerformed && !bigRotationPerformed) {
                 /*
                 Повороты не производились
@@ -398,8 +402,8 @@ class AVLVerifier(startDigest: Digest) {
         if (result) {
             curDigest = newDigest
         } else {
-            println(Base64.getEncoder().encodeToString(curHash.data))
-            println(Base64.getEncoder().encodeToString(newDigest.data))
+            //println(Base64.getEncoder().encodeToString(curHash.data))
+            //println(Base64.getEncoder().encodeToString(newDigest.data))
         }
         return result
     }
