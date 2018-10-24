@@ -42,7 +42,7 @@ public class AVLTree {
 
     public TreeResponse<Proof, LeafData, LeafNode> remove(int key) throws Exception {
         removeAnswer = null;
-        root = (TreeNode)removeHelper(root, key, new MutableInteger(1));
+        root = (TreeNode)removeHelper(root, key);
         TreeResponse<Proof, LeafData, LeafNode> result = find(removeAnswer.getKey());
         //System.out.println(result.getThird().getKey());
         //root = (TreeNode) balance(root, key);
@@ -305,11 +305,10 @@ public class AVLTree {
 
     private LeafNode removeAnswer;
 
-    private Node removeHelper(TreeNode currentNode, int key, MutableInteger integer) {
+    private Node removeHelper(TreeNode currentNode, int key) {
         Node rightNode = currentNode.getRight();
         Node leftNode = currentNode.getLeft();
         if ((rightNode instanceof LeafNode) && ((LeafNode) rightNode).getKey() == key) {
-            integer.setValue(0);
             LeafNode rightNextKey = ((LeafNode) rightNode).getNextKey();
             LeafNode rightPrevKey = ((LeafNode) rightNode).getPrevKey();
             if (rightNextKey != null) {
@@ -324,7 +323,6 @@ public class AVLTree {
             return leftNode;
         }
         if ((leftNode instanceof LeafNode) && ((LeafNode) leftNode).getKey() == key) {
-            integer.setValue(0);
             LeafNode leftNextKey = ((LeafNode) leftNode).getNextKey();
             LeafNode leftPrevKey = ((LeafNode) leftNode).getPrevKey();
             if (leftNextKey != null) {
@@ -339,9 +337,9 @@ public class AVLTree {
             return rightNode;
         }
         if (key < currentNode.getRightMin()) {
-            currentNode.setLeft(removeHelper((TreeNode)currentNode.getLeft(), key, integer));
+            currentNode.setLeft(removeHelper((TreeNode)currentNode.getLeft(), key));
         } else {
-            currentNode.setRight(removeHelper((TreeNode)currentNode.getRight(), key, integer));
+            currentNode.setRight(removeHelper((TreeNode)currentNode.getRight(), key));
         }
         currentNode.calculateAll();
         return currentNode;/*
