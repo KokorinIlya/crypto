@@ -1,5 +1,7 @@
 package avl;
 
+import sun.java2d.xr.MutableInteger;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,8 +33,18 @@ public class AVLTree {
         LeafNode newNode = new LeafNode(key, null, null, new LeafData(data), null);
         addHelper(root, null, newNode);
         TreeResponse<Proof, LeafData, LeafNode> result = find(key);
-        System.out.println("BEFORE: " + this);
+        if (key == 15) {
+            //System.out.println("BEFORE: " + this);
+        }
         root = (TreeNode) balance(root, newNode.getKey());
+        return result;
+    }
+
+    public TreeResponse<Proof, LeafData, LeafNode> remove(int key) throws Exception {
+        LeafNode leaf = removeHelper(root, key, new MutableInteger(1));
+        TreeResponse<Proof, LeafData, LeafNode> result = find(leaf.getKey());
+        ////System.out.println(result.getThird().getKey());
+        //root = (TreeNode) balance(root, key);
         return result;
     }
 
@@ -73,13 +85,13 @@ public class AVLTree {
                 moveLeft ? Direction.RIGHT : Direction.LEFT
             );
             if (justAns) {
-                System.out.println(leaf.getKey() + "!");
+                //System.out.println(leaf.getKey() + "!");
                 result.add(proofEntity);
             }
         } else if (node instanceof TreeNode) {
             TreeNode tree = (TreeNode) node;
             if (justAns) {
-                System.out.println(tree.getRightMin() + "?");
+                //System.out.println(tree.getRightMin() + "?");
                 ProofEntity proofEntity = new ProofEntity(
                     tree.getHash(),
                     moveLeft ? Direction.RIGHT : Direction.LEFT
@@ -139,12 +151,13 @@ public class AVLTree {
         tree.calculateAll();
         int diff = getDiff(tree);
         if (diff == -2) {
-            if (getDiff(tree.getRight()) <= 0) {
+            int dr = getDiff(tree.getRight());
+            if (dr == 0 || dr == -1) {
+                //System.out.println("Left SMALL rotation! --> from " + tree.getHash() + ":\n" + this);
                 TreeNode a = tree;
                 if (tree.getRight() instanceof LeafNode) {
                     return tree;
                 }
-                System.out.println("Left SMALL rotation! --> from " + tree.getHash() + ":\n" + this);
                 TreeNode b = (TreeNode) tree.getRight();
                 a.setRight(b.getLeft());
                 b.setLeft(a);
@@ -152,13 +165,17 @@ public class AVLTree {
                 result.setLeft(balanceNode(result.getLeft()));
                 result.calculateAll();
                 return result;
-            } else {
-                System.out.println("Left BIG rotation! --> from " + tree.getHash() + ":\n" + this);
+            } else if (dr == 1) {
+                //System.out.println("Left BIG rotation! --> from " + tree.getHash() + ":\n" + this);
                 TreeNode b = (TreeNode) tree.getRight();
                 if (b.getLeft() instanceof LeafNode) {
                     return tree;
                 }
                 TreeNode c = (TreeNode) b.getLeft();
+                int dc = getDiff(c);
+                if (dc != 0 && dc != 1 && dc != -1) {
+                    return tree;
+                }
                 tree.setRight(c.getLeft());
                 b.setLeft(c.getRight());
                 c.setLeft(tree);
@@ -170,8 +187,9 @@ public class AVLTree {
                 return result;
             }
         } else if (diff == 2) {
-            if (getDiff(tree.getLeft()) <= 0) {
-                System.out.println("Right SMALL rotation! --> from " + tree.getHash() + ":\n" + this);
+            int dr = getDiff(tree.getLeft());
+            if (dr == 0 || dr == -1) {
+                //System.out.println("Right SMALL rotation! --> from " + tree.getHash() + ":\n" + this);
                 if (tree.getLeft() instanceof LeafNode) {
                     return tree;
                 }
@@ -183,12 +201,16 @@ public class AVLTree {
                 result.calculateAll();
                 return result;
             } else {
-                System.out.println("Right BIG rotation! --> from " + tree.getHash() + ":\n" + this);
+                //System.out.println("Right BIG rotation! --> from " + tree.getHash() + ":\n" + this);
                 TreeNode b = (TreeNode) tree.getLeft();
                 if (b.getRight() instanceof LeafNode) {
                     return tree;
                 }
                 TreeNode c = (TreeNode) b.getRight();
+                int dc = getDiff(c);
+                if (dc != 0 && dc != 1 && dc != -1) {
+                    return tree;
+                }
                 tree.setLeft(c.getRight());
                 b.setRight(c.getLeft());
                 c.setRight(tree);
@@ -277,6 +299,52 @@ public class AVLTree {
                 }
             }
             node.calculateAll();
+        }
+    }
+
+    private LeafNode removeHelper(TreeNode currentNode, int key, MutableInteger integer) {
+        Node rightNode = currentNode.getRight();
+        Node leftNode = currentNode.getLeft();
+        if ((rightNode instanceof LeafNode) && (leftNode instanceof LeafNode)) {
+            integer.setValue(0);
+            LeafNode answer;
+            if (((LeafNode) rightNode).getKey() == key) {
+                answer = (LeafNode) leftNode;
+                LeafNode rightNextKey = ((LeafNode) rightNode).getNextKey();
+                answer.setNextKey(rightNextKey);
+                if (rightNextKey != null) {
+                    rightNextKey.setPrevKey(answer);
+                }
+            } else {
+                answer = (LeafNode) rightNode;
+                LeafNode leftPrevKey = ((LeafNode) leftNode).getPrevKey();
+                answer.setPrevKey(leftPrevKey);
+                if (leftPrevKey != null) {
+                    leftPrevKey.setNextKey(answer);
+                }
+            }
+            answer.recalcHash();
+//            //System.out.println(answer.getNextKey().getKey());
+            return answer;
+        } else {
+            int rightMin = currentNode.getRightMin();
+            TreeNode next = null;
+            if (rightMin > key) {
+                next = (TreeNode) currentNode.getLeft();
+            } else {
+                next = (TreeNode) currentNode.getRight();
+            }
+            LeafNode node = removeHelper(next, key, integer);
+            if (integer.getValue() == 0) {
+                if (rightMin > key) {
+                    currentNode.setLeft(node);
+                } else {
+                    currentNode.setRight(node);
+                }
+                integer.setValue(1);
+            }
+            currentNode.calculateAll();
+            return node;
         }
     }
 
