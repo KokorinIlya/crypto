@@ -2,8 +2,6 @@ package avl;
 
 import org.junit.Test;
 
-import java.util.Random;
-
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -136,7 +134,7 @@ public class AVLTreeTester {
         AVLTree avlTree = new AVLTree();
         byte[] b = new byte[]{2, 4, 6, 0, 1};
         avlTree.add(10, b);
-        avlTree.remove(15);
+        avlTree.remove(10);
         avlTree.add(20, b);
         avlTree.remove(20);
         avlTree.add(15, b);
@@ -169,8 +167,8 @@ public class AVLTreeTester {
         AVLTree avlTree = new AVLTree();
         byte[] b = new byte[]{2, 4, 6, 0, 1};
         avlTree.add(10, b);
-        avlTree.add(10, b);
-        avlTree.add(10, b);
+        avlTree.add(11, b);
+        avlTree.add(12, b);
         avlTree.remove(10);
         avlTree.add(20, b);
         TreeResponse<Proof, LeafData, LeafNode> pair = avlTree.find(20);

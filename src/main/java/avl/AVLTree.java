@@ -41,9 +41,10 @@ public class AVLTree {
     }
 
     public TreeResponse<Proof, LeafData, LeafNode> remove(int key) throws Exception {
-        LeafNode leaf = removeHelper(root, key, new MutableInteger(1));
-        TreeResponse<Proof, LeafData, LeafNode> result = find(leaf.getKey());
-        ////System.out.println(result.getThird().getKey());
+        removeAnswer = null;
+        root = (TreeNode)removeHelper(root, key);
+        TreeResponse<Proof, LeafData, LeafNode> result = find(removeAnswer.getKey());
+        //System.out.println(result.getThird().getKey());
         //root = (TreeNode) balance(root, key);
         return result;
     }
@@ -302,50 +303,46 @@ public class AVLTree {
         }
     }
 
-    private LeafNode removeHelper(TreeNode currentNode, int key, MutableInteger integer) {
+    private LeafNode removeAnswer;
+
+    private Node removeHelper(TreeNode currentNode, int key) {
         Node rightNode = currentNode.getRight();
         Node leftNode = currentNode.getLeft();
-        if ((rightNode instanceof LeafNode) && (leftNode instanceof LeafNode)) {
-            integer.setValue(0);
-            LeafNode answer;
-            if (((LeafNode) rightNode).getKey() == key) {
-                answer = (LeafNode) leftNode;
-                LeafNode rightNextKey = ((LeafNode) rightNode).getNextKey();
-                answer.setNextKey(rightNextKey);
-                if (rightNextKey != null) {
-                    rightNextKey.setPrevKey(answer);
-                }
-            } else {
-                answer = (LeafNode) rightNode;
-                LeafNode leftPrevKey = ((LeafNode) leftNode).getPrevKey();
-                answer.setPrevKey(leftPrevKey);
-                if (leftPrevKey != null) {
-                    leftPrevKey.setNextKey(answer);
-                }
+        if ((rightNode instanceof LeafNode) && ((LeafNode) rightNode).getKey() == key) {
+            LeafNode rightNextKey = ((LeafNode) rightNode).getNextKey();
+            LeafNode rightPrevKey = ((LeafNode) rightNode).getPrevKey();
+            if (rightNextKey != null) {
+                rightNextKey.setPrevKey(rightPrevKey);
+                rightNextKey.recalcHash();
             }
-            answer.recalcHash();
-//            //System.out.println(answer.getNextKey().getKey());
-            return answer;
-        } else {
-            int rightMin = currentNode.getRightMin();
-            TreeNode next = null;
-            if (rightMin > key) {
-                next = (TreeNode) currentNode.getLeft();
-            } else {
-                next = (TreeNode) currentNode.getRight();
+            if (rightPrevKey != null) {
+                rightPrevKey.setNextKey(rightNextKey);
+                rightPrevKey.recalcHash();
             }
-            LeafNode node = removeHelper(next, key, integer);
-            if (integer.getValue() == 0) {
-                if (rightMin > key) {
-                    currentNode.setLeft(node);
-                } else {
-                    currentNode.setRight(node);
-                }
-                integer.setValue(1);
-            }
-            currentNode.calculateAll();
-            return node;
+            removeAnswer = rightPrevKey;
+            return leftNode;
         }
+        if ((leftNode instanceof LeafNode) && ((LeafNode) leftNode).getKey() == key) {
+            LeafNode leftNextKey = ((LeafNode) leftNode).getNextKey();
+            LeafNode leftPrevKey = ((LeafNode) leftNode).getPrevKey();
+            if (leftNextKey != null) {
+                leftNextKey.setPrevKey(leftPrevKey);
+                leftNextKey.recalcHash();
+            }
+            if (leftPrevKey != null) {
+                leftPrevKey.setNextKey(leftNextKey);
+                leftPrevKey.recalcHash();
+            }
+            removeAnswer = leftPrevKey;
+            return rightNode;
+        }
+        if (key < currentNode.getRightMin()) {
+            currentNode.setLeft(removeHelper((TreeNode)currentNode.getLeft(), key));
+        } else {
+            currentNode.setRight(removeHelper((TreeNode)currentNode.getRight(), key));
+        }
+        currentNode.calculateAll();
+        return currentNode;
     }
 
     @Override
